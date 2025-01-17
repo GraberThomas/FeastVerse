@@ -1,4 +1,4 @@
-package org.example;
+package graber.thomas.FeastVerse;
 
 public class Main {
     public static void main(String[] args) {
