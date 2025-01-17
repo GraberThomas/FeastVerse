@@ -1,0 +1,34 @@
+spring:
+  application:
+    name: FeastVerse
+  datasource:
+    url: jdbc:${POSTGRES_URL}://localhost:5432/feastverse_db
+    driver-class-name: org.postgresql.Driver
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
+  jpa:
+    show-sql: true
+    defer-datasource-initialization: true
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+  sql:
+    init:
+#      data-locations: classpath:db-init/data.sql
+      mode: never
+server:
+  servlet:
+    context-path: /api/v1
+
+jwt:
+  secret: ${JWT_SECRET}
+  expiration: 3600
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
