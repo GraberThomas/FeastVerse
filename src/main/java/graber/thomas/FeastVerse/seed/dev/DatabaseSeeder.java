@@ -13,7 +13,7 @@ import java.time.LocalDate;
 import java.util.Set;
 
 @Component
-@Profile("dev") // Ne sera exécuté qu'en mode développement
+@Profile("dev")
 public class DatabaseSeeder implements CommandLineRunner {
 
     private final UserRepository userRepository;
