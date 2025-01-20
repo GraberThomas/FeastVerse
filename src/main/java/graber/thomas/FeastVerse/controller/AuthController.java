@@ -1,7 +1,7 @@
 package graber.thomas.FeastVerse.controller;
 
-import graber.thomas.FeastVerse.dto.AuthenticationRequestCreateDto;
-import graber.thomas.FeastVerse.dto.AuthenticationRequestDto;
+import graber.thomas.FeastVerse.dto.auth.AuthenticationRequestCreateDto;
+import graber.thomas.FeastVerse.dto.auth.AuthenticationRequestDto;
 import graber.thomas.FeastVerse.exception.UserAlreadyExistsException;
 import graber.thomas.FeastVerse.model.User;
 import graber.thomas.FeastVerse.model.UserType;
