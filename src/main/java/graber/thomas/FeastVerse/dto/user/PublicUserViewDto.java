@@ -1,9 +1,6 @@
 package graber.thomas.FeastVerse.dto.user;
 
-import graber.thomas.FeastVerse.model.UserType;
-
 import java.time.LocalDate;
-import java.util.Set;
 import java.util.UUID;
 
 public class PublicUserViewDto implements UserView {
