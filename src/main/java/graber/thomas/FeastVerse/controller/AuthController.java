@@ -53,14 +53,14 @@ public class AuthController {
 
     @Operation(
             summary = "User Sign-In",
-            description = "Authenticates the user using email and password. If successful, returns a JWT access token; otherwise, throws an exception indicating incorrect credentials."
+            description = "Authenticates the user using email or pseudo and password. If successful, returns a JWT access token; otherwise, throws an exception indicating incorrect credentials."
     )
     @PostMapping("/sign-in")
     public ResponseEntity<Map<String, String>> authenticateUser(@Valid @RequestBody AuthenticationRequestDto authenticationRequestDto) {
         try {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
-                            authenticationRequestDto.email(),
+                            authenticationRequestDto.username(),
                             authenticationRequestDto.password()
                     )
             );
@@ -68,7 +68,7 @@ public class AuthController {
             throw new RuntimeException("Incorrect username or password", e);
         }
 
-        final UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequestDto.email());
+        final UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequestDto.username());
         final String jwt = jwtUtil.generateToken(userDetails.getUsername());
 
         return ResponseEntity.ok(Map.of("accessToken", jwt));
@@ -76,7 +76,7 @@ public class AuthController {
 
     @Operation(
             summary = "User Registration",
-            description = "Registers a new user with the provided credentials. If the email is already taken, an exception is thrown."
+            description = "Registers a new user with the provided credentials. If the username is already taken, an exception is thrown."
     )
     @PostMapping("/signup")
     public User registerUser(@Valid @RequestBody AuthenticationRequestCreateDto authenticationRequestCreateDto) {
@@ -86,6 +86,11 @@ public class AuthController {
                     throw new UserAlreadyExistsException("Email is already registered: " + authenticationRequestCreateDto.email());
                 });
 
+        userService.getByUsername(authenticationRequestCreateDto.pseudo())
+                .ifPresent(user -> {
+                    throw new UserAlreadyExistsException("Pseudo is already registered: " + authenticationRequestCreateDto.email());
+                });
+
         // -- Create a new user's account
         User newUser = new User();
         newUser.setEmail(authenticationRequestCreateDto.email());
@@ -93,6 +98,7 @@ public class AuthController {
         newUser.setFirstName(authenticationRequestCreateDto.firstName());
         newUser.setLastName(authenticationRequestCreateDto.lastName());
         newUser.setRoles(new HashSet<>(Set.of(UserType.STANDARD)));
+        newUser.setPseudo(authenticationRequestCreateDto.pseudo());
 
         return userService.create(newUser)
                 .orElseThrow(() -> new RuntimeException("Error occurred while adding user"));

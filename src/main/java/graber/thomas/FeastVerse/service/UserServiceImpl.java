@@ -23,9 +23,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Optional<User> getByUsername(String username) {
-        // -- In our context, the username represent email
-        // -- But in spring security username can be email, id, pseudo, phone number and so on...
-        return Optional.ofNullable(this.userRepository.findUserByEmail(username));
+        // -- In our context, the username represent username
+        // -- But in spring security username can be username, id, pseudo, phone number and so on...
+        if(username.contains("@")) {
+            return Optional.ofNullable(this.userRepository.findUserByEmail(username));
+        }else{
+            return Optional.ofNullable(this.userRepository.findUserByPseudo(username));
+        }
     }
 
     @Override

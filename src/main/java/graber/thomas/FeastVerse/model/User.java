@@ -19,6 +19,10 @@ public class User {
     private String lastName;
     private String email;
 
+    @Column(unique = true, nullable = false)
+    private String pseudo;
+
+
     @JsonIgnore // -- To ignore password in api response
     private String password;
 
@@ -104,5 +108,13 @@ public class User {
 
     public void setUpdatedDate(LocalDate updatedDate) {
         this.updatedDate = updatedDate;
+    }
+
+    public String getPseudo() {
+        return pseudo;
+    }
+
+    public void setPseudo(String pseudo) {
+        this.pseudo = pseudo;
     }
 }

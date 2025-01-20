@@ -19,6 +19,9 @@ public record AuthenticationRequestCreateDto(
         @ValidEmail
         String email,
 
+        @NotBlank(message = "Pseudo can't be empty.")
+        String pseudo,
+
         @NotBlank(message = "Password can't be empty.")
         @ValidPassword
         String password

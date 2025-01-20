@@ -17,9 +17,9 @@ public interface UserService {
     Optional<User> get(UUID id);
 
     /**
-     * Get user by username (email)
-     * @param username the user's email
-     * @return the user find by email
+     * Get user by username (username)
+     * @param username the user's username
+     * @return the user find by username
      */
     Optional<User> getByUsername(String username);
 
