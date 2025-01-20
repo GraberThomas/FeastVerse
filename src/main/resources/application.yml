@@ -16,7 +16,7 @@ spring:
         format_sql: true
   sql:
     init:
-#      data-locations: classpath:db-init/data.sql
+      data-locations: classpath:db-init/data.sql
       mode: never
 server:
   servlet:
