@@ -56,7 +56,7 @@ public class AuthController {
             description = "Authenticates the user using email and password. If successful, returns a JWT access token; otherwise, throws an exception indicating incorrect credentials."
     )
     @PostMapping("/sign-in")
-    public ResponseEntity<Map<String, String>> authenticateUser(@RequestBody AuthenticationRequestDto authenticationRequestDto) {
+    public ResponseEntity<Map<String, String>> authenticateUser(@Valid @RequestBody AuthenticationRequestDto authenticationRequestDto) {
         try {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
