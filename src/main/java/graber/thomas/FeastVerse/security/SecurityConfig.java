@@ -57,11 +57,11 @@ public class SecurityConfig {
                 ).authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
                                 .requestMatchers("/api/v1/auth/sign-in", "/api/v1/auth/signup", "/h2-console/**").permitAll() // Use 'requestMatchers' instead of 'antMatchers' "/api/test/all"
-                                .requestMatchers("/api/v1/books/**").hasAnyRole("ADMINISTRATOR", "BORROWER", "LIBRARIAN")
+                                .requestMatchers("/api/v1/books/**").hasAnyRole("ADMINISTRATOR", "STANDARD", "MODERATOR")
                                 .requestMatchers(new AndRequestMatcher(new AntPathRequestMatcher("/api/v1/books/**", HttpMethod.DELETE.name()))).hasRole(UserType.ADMINISTRATOR.name()) // ADMIN can delete
-                                .requestMatchers(new AndRequestMatcher(new AntPathRequestMatcher("/api/v1/books/**", HttpMethod.POST.name()))).hasAnyRole(UserType.ADMINISTRATOR.name(), UserType.LIBRARIAN.name()) // Admin and librarian can create or update
-                                .requestMatchers(new AndRequestMatcher(new AntPathRequestMatcher("/api/v1/books/**", HttpMethod.PUT.name()))).hasAnyRole(UserType.ADMINISTRATOR.name(), UserType.LIBRARIAN.name())
-                                .requestMatchers(new AndRequestMatcher(new AntPathRequestMatcher("/api/v1/books/**", HttpMethod.GET.name()))).hasAnyRole(UserType.ADMINISTRATOR.name(), UserType.LIBRARIAN.name(), UserType.BORROWER.name()) // Any role can read
+                                .requestMatchers(new AndRequestMatcher(new AntPathRequestMatcher("/api/v1/books/**", HttpMethod.POST.name()))).hasAnyRole(UserType.ADMINISTRATOR.name(), UserType.MODERATOR.name()) // Admin and librarian can create or update
+                                .requestMatchers(new AndRequestMatcher(new AntPathRequestMatcher("/api/v1/books/**", HttpMethod.PUT.name()))).hasAnyRole(UserType.ADMINISTRATOR.name(), UserType.MODERATOR.name())
+                                .requestMatchers(new AndRequestMatcher(new AntPathRequestMatcher("/api/v1/books/**", HttpMethod.GET.name()))).hasAnyRole(UserType.ADMINISTRATOR.name(), UserType.MODERATOR.name(), UserType.STANDARD.name()) // Any role can read
                                 .anyRequest().authenticated()
                 ); */
 

@@ -3,6 +3,7 @@ package graber.thomas.FeastVerse.controller;
 import graber.thomas.FeastVerse.dto.AuthenticationRequestCreateDto;
 import graber.thomas.FeastVerse.dto.AuthenticationRequestDto;
 import graber.thomas.FeastVerse.model.User;
+import graber.thomas.FeastVerse.model.UserType;
 import graber.thomas.FeastVerse.security.JwtUtil;
 import graber.thomas.FeastVerse.security.MyUserDetailsService;
 import graber.thomas.FeastVerse.service.UserService;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 
 @Tag(name = "Auth", description = "Endpoints for authentification")
@@ -89,7 +91,7 @@ public class AuthController {
         newUser.setPassword(encoder.encode(authenticationRequestCreateDto.password()));
         newUser.setFirstName(authenticationRequestCreateDto.firstName());
         newUser.setLastName(authenticationRequestCreateDto.lastName());
-        newUser.setRoles(new HashSet<>(authenticationRequestCreateDto.roles()));
+        newUser.setRoles(new HashSet<>(Set.of(UserType.STANDARD)));
 
         return userService.create(newUser)
                 .orElseThrow(() -> new RuntimeException("Error occurred while adding user"));

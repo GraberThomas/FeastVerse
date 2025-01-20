@@ -25,9 +25,6 @@ public class MyUserDetailsService implements UserDetailsService {
         User user = userService.getByUsername(username)
                     .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-        // RUI => ROLES : BORROWER, LIBRARIAN => ROLE_BORROWER, ROLE_LIBRARIAN
-        // ADMINISTRATOR, BORROWER, LIBRARIAN
-
         // RBAC => ROLE BASED ACCESS CONTROL
         // -- Convert user roles to GrantedAuthority objects of spring security
         // -- This is required by spring security to check user roles in security config
