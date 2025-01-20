@@ -2,6 +2,7 @@ package graber.thomas.FeastVerse.controller;
 
 import graber.thomas.FeastVerse.dto.AuthenticationRequestCreateDto;
 import graber.thomas.FeastVerse.dto.AuthenticationRequestDto;
+import graber.thomas.FeastVerse.exception.UserAlreadyExistsException;
 import graber.thomas.FeastVerse.model.User;
 import graber.thomas.FeastVerse.model.UserType;
 import graber.thomas.FeastVerse.security.JwtUtil;
@@ -9,6 +10,7 @@ import graber.thomas.FeastVerse.security.MyUserDetailsService;
 import graber.thomas.FeastVerse.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -55,7 +57,6 @@ public class AuthController {
     )
     @PostMapping("/sign-in")
     public ResponseEntity<Map<String, String>> authenticateUser(@RequestBody AuthenticationRequestDto authenticationRequestDto) {
-
         try {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
@@ -78,11 +79,11 @@ public class AuthController {
             description = "Registers a new user with the provided credentials. If the email is already taken, an exception is thrown."
     )
     @PostMapping("/signup")
-    public User registerUser(@RequestBody AuthenticationRequestCreateDto authenticationRequestCreateDto) {
+    public User registerUser(@Valid @RequestBody AuthenticationRequestCreateDto authenticationRequestCreateDto) {
         // -- Check if the username is already taken
         userService.getByUsername(authenticationRequestCreateDto.email())
                 .ifPresent(user -> {
-                    throw new RuntimeException("Error: user already exists, please sign in");
+                    throw new UserAlreadyExistsException("Email is already registered: " + authenticationRequestCreateDto.email());
                 });
 
         // -- Create a new user's account
