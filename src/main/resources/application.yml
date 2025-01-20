@@ -2,7 +2,7 @@ spring:
   application:
     name: FeastVerse
   datasource:
-    url: jdbc:${POSTGRES_URL}://localhost:5432/feastverse_db
+    url: jdbc:postgresql://${POSTGRES_URL}:5432/feastverse_db
     driver-class-name: org.postgresql.Driver
     username: ${POSTGRES_USER}
     password: ${POSTGRES_PASSWORD}
