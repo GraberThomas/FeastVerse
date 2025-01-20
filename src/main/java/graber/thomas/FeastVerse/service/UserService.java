@@ -3,6 +3,7 @@ package graber.thomas.FeastVerse.service;
 import graber.thomas.FeastVerse.model.User;
 
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * User service
@@ -13,7 +14,7 @@ public interface UserService {
      * @param id the user id
      * @return the user find by id
      */
-    Optional<User> get(Long id);
+    Optional<User> get(UUID id);
 
     /**
      * Get user by username (email)

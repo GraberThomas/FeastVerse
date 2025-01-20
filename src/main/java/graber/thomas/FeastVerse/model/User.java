@@ -2,16 +2,19 @@ package graber.thomas.FeastVerse.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import org.hibernate.annotations.ColumnDefault;
 
 import java.time.LocalDate;
 import java.util.Set;
+import java.util.UUID;
 
 @Entity
 @Table(name = "users")
 public class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue
+    @ColumnDefault(value = "gen_random_uuid()")
+    private UUID id;
     private String firstName;
     private String lastName;
     private String email;
@@ -28,7 +31,7 @@ public class User {
     public User() {
     }
 
-    public User(Long id, String firstName, String lastName, String email, String password, Set<UserType> roles, LocalDate createdDate, LocalDate updatedDate) {
+    public User(UUID id, String firstName, String lastName, String email, String password, Set<UserType> roles, LocalDate createdDate, LocalDate updatedDate) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -39,11 +42,11 @@ public class User {
         this.updatedDate = updatedDate;
     }
 
-    public Long getId() {
+    public UUID getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 

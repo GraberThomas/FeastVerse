@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -16,7 +17,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Optional<User> get(Long id) {
+    public Optional<User> get(UUID id) {
         return this.userRepository.findById(id);
     }
 
