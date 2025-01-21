@@ -1,9 +1,11 @@
 package graber.thomas.feastverse.service;
 
+import graber.thomas.feastverse.dto.user.UpdateDto;
 import graber.thomas.feastverse.model.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.nio.file.AccessDeniedException;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -61,6 +63,19 @@ public interface UserService {
      * @return user updated
      */
     Optional<User> update(User user);
+
+    /**
+     * Partially updates a user's information based on the provided UpdateDto.
+     * Allows modifying specific fields without overwriting entire user data.
+     * Ensures that restricted updates, such as role changes, are enforced based
+     * on administrative privileges.
+     *
+     * @param user the existing user entity to be updated
+     * @param updateDto an UpdateDto containing the fields to be updated
+     * @return an Optional containing the updated User entity if the operation is
+     *         successful, or an empty Optional if the update cannot be completed
+     */
+    Optional<User> patch(User user, UpdateDto updateDto) throws AccessDeniedException;
 
     /**
      * Delete existing user

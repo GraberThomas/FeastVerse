@@ -1,13 +1,17 @@
 package graber.thomas.feastverse.service;
+import graber.thomas.feastverse.dto.user.UpdateDto;
 import graber.thomas.feastverse.model.User;
 import graber.thomas.feastverse.model.UserType;
 import graber.thomas.feastverse.repository.user.UserRepository;
 import graber.thomas.feastverse.repository.user.UserSpecifications;
+import graber.thomas.feastverse.utils.SecurityUtils;
+import org.apache.catalina.security.SecurityUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.nio.file.AccessDeniedException;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -91,6 +95,41 @@ public class UserServiceImpl implements UserService {
     public Optional<User> update(User user) {
         // -- Set user update date to now
         user.setUpdatedDate(LocalDate.now());
+        return Optional.of(this.userRepository.save(user));
+    }
+
+    @Override
+    public Optional<User> patch(User user, UpdateDto updateDto) throws AccessDeniedException {
+        final boolean isAdmin = SecurityUtils.hasRole("ROLE_ADMINISTRATOR");
+
+        if(!isAdmin && updateDto.roles() != null){
+            throw new AccessDeniedException("Only administrators can update roles.");
+        }
+
+        if(updateDto.firstName() != null){
+            user.setFirstName(updateDto.firstName());
+        }
+
+        if(updateDto.lastName() != null){
+            user.setLastName(updateDto.lastName());
+        }
+
+        if(updateDto.email() != null){
+            user.setEmail(updateDto.email());
+        }
+
+        System.out.println(updateDto.roles());
+
+        if(updateDto.roles() != null){
+            user.setRoles(updateDto.roles());
+        }
+
+        if(updateDto.pseudo() != null){
+            user.setPseudo(updateDto.pseudo());
+        }
+
+        user.setUpdatedDate(LocalDate.now());
+
         return Optional.of(this.userRepository.save(user));
     }
 

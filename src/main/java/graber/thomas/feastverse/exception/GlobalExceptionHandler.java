@@ -2,6 +2,7 @@ package graber.thomas.feastverse.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -54,6 +55,21 @@ public class GlobalExceptionHandler {
         response.put("message", ex.getMessage());
 
         return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<Map<String, Object>> handleHttpMessageNotReadable(
+            HttpMessageNotReadableException ex,
+            WebRequest request
+    ) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("timestamp", OffsetDateTime.now());
+        response.put("status", HttpStatus.BAD_REQUEST.value());
+        response.put("error", HttpStatus.BAD_REQUEST.getReasonPhrase());
+        response.put("message", "The request body is missing or invalid.");
+        response.put("path", request.getDescription(false).replace("uri=", ""));
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
 }

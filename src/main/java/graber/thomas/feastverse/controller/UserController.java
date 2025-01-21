@@ -1,19 +1,25 @@
 package graber.thomas.feastverse.controller;
 
+import graber.thomas.feastverse.dto.user.UpdateDto;
 import graber.thomas.feastverse.dto.user.UserMapper;
 import graber.thomas.feastverse.dto.user.UserView;
 import graber.thomas.feastverse.model.User;
 import graber.thomas.feastverse.service.UserService;
+import graber.thomas.feastverse.utils.SecurityUtils;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.Authentication;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.nio.file.AccessDeniedException;
+import java.util.Optional;
 import java.util.UUID;
 
 @Tag(name = "User", description = "Endpoints for users")
@@ -30,13 +36,11 @@ public class UserController {
     }
 
     @GetMapping("/{userId}")
-    public UserView getUser(@PathVariable UUID userId, Authentication authentication) {
+    public UserView getUser(@PathVariable UUID userId) {
         User user = this.userService.get(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-        boolean isAdmin = authentication != null &&
-                authentication.getAuthorities().stream()
-                        .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMINISTRATOR"));
+        boolean isAdmin = SecurityUtils.hasRole("ROLE_ADMINISTRATOR");
 
         if (isAdmin) {
             return userMapper.toAdminUserDto(user);
@@ -52,13 +56,9 @@ public class UserController {
             @RequestParam(required = false) String firstName,
             @RequestParam(required = false) String pseudo,
             @RequestParam(required = false) String email,
-            Pageable pageable,
-            Authentication authentication
+            Pageable pageable
     ) {
-        boolean isAdmin = authentication != null &&
-                authentication.getAuthorities().stream()
-                        .anyMatch(grantedAuthority ->
-                                grantedAuthority.getAuthority().equals("ROLE_ADMINISTRATOR"));
+        boolean isAdmin = SecurityUtils.hasRole("ROLE_ADMINISTRATOR");
 
         if(role != null || lastName != null || firstName != null || pseudo != null || email != null) {
             if(!isAdmin){
@@ -82,5 +82,42 @@ public class UserController {
         });
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMINISTRATOR') or #userId == authentication.principal.id")
+    @PatchMapping("/{userId}")
+    public UserView updateUser(@PathVariable UUID userId, @Valid @RequestBody UpdateDto updateDto) {
+        User existingUser = this.userService.get(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        Optional<User> updatedUser = Optional.empty();
+
+        try {
+            updatedUser = userService.patch(existingUser, updateDto);
+        } catch (AccessDeniedException e) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, e.getMessage());
+        }
+
+        final boolean isAdmin = SecurityUtils.hasRole("ROLE_ADMINISTRATOR");
+
+        if(updatedUser.isEmpty()){
+            throw  new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        if (isAdmin) {
+            return userMapper.toAdminUserDto(updatedUser.get());
+        } else {
+            return userMapper.toPublicUserDto(updatedUser.get());
+        }
+    }
+
+
+    @PreAuthorize("hasRole('ROLE_ADMINISTRATOR')")
+    @DeleteMapping("/{userId}")
+    public ResponseEntity<Void> deleteUser(@PathVariable UUID userId) {
+        User existingUser = this.userService.get(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        this.userService.delete(existingUser);
+        return ResponseEntity.noContent().build();
+    }
 
 }
