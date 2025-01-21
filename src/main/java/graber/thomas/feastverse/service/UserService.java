@@ -25,7 +25,7 @@ public interface UserService {
     Optional<User> get(UUID id);
 
 
-    public Page<User> getAllUsers(String role,
+    Page<User> getAllUsers(String role,
                                   String lastName,
                                   String firstName,
                                   String pseudo,
