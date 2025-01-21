@@ -4,8 +4,8 @@ import graber.thomas.feastverse.dto.user.UpdateDto;
 import graber.thomas.feastverse.dto.user.UserMapper;
 import graber.thomas.feastverse.dto.user.UserView;
 import graber.thomas.feastverse.model.User;
+import graber.thomas.feastverse.service.SecurityService;
 import graber.thomas.feastverse.service.UserService;
-import graber.thomas.feastverse.utils.SecurityUtils;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
@@ -13,13 +13,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.nio.file.AccessDeniedException;
-import java.util.Optional;
 import java.util.UUID;
 
 @Tag(name = "User", description = "Endpoints for users")
@@ -28,11 +28,14 @@ import java.util.UUID;
 public class UserController {
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
     private final UserService userService;
+    private final SecurityService securityService;
     private final UserMapper userMapper;
 
-    public UserController(UserService userService, UserMapper userMapper) {
+
+    public UserController(UserService userService, SecurityService securityService, UserMapper userMapper) {
         this.userService = userService;
         this.userMapper = userMapper;
+        this.securityService = securityService;
     }
 
     @GetMapping("/{userId}")
@@ -40,11 +43,15 @@ public class UserController {
         User user = this.userService.get(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-        boolean isAdmin = SecurityUtils.hasRole("ROLE_ADMINISTRATOR");
+        boolean isAdmin = securityService.hasRole("ROLE_ADMINISTRATOR");
+        String currentUserId = SecurityContextHolder.getContext().getAuthentication().getName();
+        boolean requestedUserIsSelf = userId.toString().equals(currentUserId);
 
         if (isAdmin) {
             return userMapper.toAdminUserDto(user);
-        } else {
+        } else if(requestedUserIsSelf){
+            return userMapper.toSelfUserDto(user);
+        }else {
             return userMapper.toPublicUserDto(user);
         }
     }
@@ -58,28 +65,22 @@ public class UserController {
             @RequestParam(required = false) String email,
             Pageable pageable
     ) {
-        boolean isAdmin = SecurityUtils.hasRole("ROLE_ADMINISTRATOR");
+        boolean isAdmin = securityService.hasRole("ROLE_ADMINISTRATOR");
+        Page<User> users;
 
-        if(role != null || lastName != null || firstName != null || pseudo != null || email != null) {
-            if(!isAdmin){
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only administrators can use filter on users.");
-            }
-            try {
-                return userService.getAllFiltered(role, lastName, firstName, pseudo, email, pageable).map(userMapper::toAdminUserDto);
-            } catch (IllegalArgumentException e) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
-            }
+        try {
+            users = userService.getAllUsers(role, lastName, firstName, pseudo, email, pageable);
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        } catch (AccessDeniedException e) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, e.getMessage());
         }
 
-        Page<User> userPage = userService.getAll(pageable);
-
-        return userPage.map(user -> {
-            if (isAdmin) {
-                return userMapper.toAdminUserDto(user);
-            } else {
-                return userMapper.toPublicUserDto(user);
-            }
-        });
+        return users.map(user ->
+                isAdmin
+                        ? userMapper.toAdminUserDto(user)
+                        : userMapper.toPublicUserDto(user)
+        );
     }
 
     @PreAuthorize("hasRole('ROLE_ADMINISTRATOR') or #userId == authentication.principal.id")
@@ -88,24 +89,20 @@ public class UserController {
         User existingUser = this.userService.get(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-        Optional<User> updatedUser = Optional.empty();
-
+        User updatedUser;
         try {
-            updatedUser = userService.patch(existingUser, updateDto);
+            updatedUser = userService.patch(existingUser, updateDto)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR));
         } catch (AccessDeniedException e) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, e.getMessage());
         }
 
-        final boolean isAdmin = SecurityUtils.hasRole("ROLE_ADMINISTRATOR");
-
-        if(updatedUser.isEmpty()){
-            throw  new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        final boolean isAdmin = securityService.hasRole("ROLE_ADMINISTRATOR");
 
         if (isAdmin) {
-            return userMapper.toAdminUserDto(updatedUser.get());
+            return userMapper.toAdminUserDto(updatedUser);
         } else {
-            return userMapper.toPublicUserDto(updatedUser.get());
+            return userMapper.toSelfUserDto(updatedUser);
         }
     }
 

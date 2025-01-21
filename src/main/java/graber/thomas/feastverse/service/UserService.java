@@ -24,24 +24,14 @@ public interface UserService {
      */
     Optional<User> get(UUID id);
 
-    /**
-     * Get all users, paginated
-     * @return all the users, paginated
-     */
-    Page<User> getAll(Pageable pageable);
 
-    /**
-     * Retrieves a paginated list of users filtered by the given parameters.
-     *
-     * @param role the role of the user to filter by, can be null to ignore this filter
-     * @param lastName the last name of the user to filter by, can be null to ignore this filter
-     * @param firstName the first name of the user to filter by, can be null to ignore this filter
-     * @param pseudo the pseudo of the user to filter by, can be null to ignore this filter
-     * @param email the email of the user to filter by, can be null to ignore this filter
-     * @param pageable the pagination and sorting information
-     * @return a paginated list of users matching the specified filters
-     */
-    Page<User> getAllFiltered(String role, String lastName, String firstName, String pseudo, String email, Pageable pageable);
+    public Page<User> getAllUsers(String role,
+                                  String lastName,
+                                  String firstName,
+                                  String pseudo,
+                                  String email,
+                                  Pageable pageable
+    ) throws AccessDeniedException, IllegalArgumentException;
 
     /**
      * Get user by username (username)

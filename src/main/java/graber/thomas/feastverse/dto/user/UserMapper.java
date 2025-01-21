@@ -19,4 +19,5 @@ import org.mapstruct.Mapper;
 public interface UserMapper {
     AdminUserViewDto toAdminUserDto(User user);
     PublicUserViewDto toPublicUserDto(User user);
+    SelfUserViewDto toSelfUserDto(User user);
 }

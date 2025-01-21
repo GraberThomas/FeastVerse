@@ -4,8 +4,6 @@ import graber.thomas.feastverse.model.User;
 import graber.thomas.feastverse.model.UserType;
 import graber.thomas.feastverse.repository.user.UserRepository;
 import graber.thomas.feastverse.repository.user.UserSpecifications;
-import graber.thomas.feastverse.utils.SecurityUtils;
-import org.apache.catalina.security.SecurityUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -27,9 +25,11 @@ import java.util.*;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final SecurityService securityService;
 
-    public UserServiceImpl(UserRepository userRepository) {
+    public UserServiceImpl(UserRepository userRepository, SecurityService securityService) {
         this.userRepository = userRepository;
+        this.securityService = securityService;
     }
 
     @Override
@@ -38,13 +38,34 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Page<User> getAll(Pageable pageable) {
-        List<String> allowedSortFields = List.of("firstName", "lastName", "email");
-        return userRepository.findAll(pageable);
+    public Page<User> getAllUsers(String role,
+                                  String lastName,
+                                  String firstName,
+                                  String pseudo,
+                                  String email,
+                                  Pageable pageable
+    ) throws AccessDeniedException, IllegalArgumentException {
+        boolean hasFilter = hasFilter(role, lastName, firstName, pseudo, email);
+
+        if (hasFilter && !securityService.hasRole("ROLE_ADMINISTRATOR")) {
+            throw new AccessDeniedException("Only administrators can use filters on users.");
+        }
+
+        if (hasFilter) {
+            return getAllFiltered(role, lastName, firstName, pseudo, email, pageable);
+        } else {
+            return userRepository.findAll(pageable);
+        }
     }
 
-    @Override
-    public Page<User> getAllFiltered(String role, String lastName, String firstName, String pseudo, String email, Pageable pageable) {
+
+    private Page<User> getAllFiltered(String role,
+                                      String lastName,
+                                      String firstName,
+                                      String pseudo,
+                                      String email,
+                                      Pageable pageable
+    ) {
         Specification<User> spec = Specification.where(null);
 
         if (role != null) {
@@ -52,6 +73,7 @@ public class UserServiceImpl implements UserService {
             Set<UserType> roles = Collections.singleton(userType);
             spec = spec.and(UserSpecifications.hasRole(roles));
         }
+
         if (lastName != null) {
             spec = spec.and(UserSpecifications.hasLastName(lastName));
         }
@@ -61,16 +83,16 @@ public class UserServiceImpl implements UserService {
         if (pseudo != null) {
             spec = spec.and(UserSpecifications.hasPseudo(pseudo));
         }
-        if(email != null) {
+        if (email != null) {
             spec = spec.and(UserSpecifications.hasEmail(email));
         }
 
-        // Appeler le repository avec la spécification
         return userRepository.findAll(spec, pageable);
     }
 
-
-
+    private boolean hasFilter(String role, String lastName, String firstName, String pseudo, String email) {
+        return (role != null || lastName != null || firstName != null || pseudo != null || email != null);
+    }
 
     @Override
     public Optional<User> getByUsername(String username) {
@@ -100,7 +122,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Optional<User> patch(User user, UpdateDto updateDto) throws AccessDeniedException {
-        final boolean isAdmin = SecurityUtils.hasRole("ROLE_ADMINISTRATOR");
+        final boolean isAdmin = securityService.hasRole("ROLE_ADMINISTRATOR");
 
         if(!isAdmin && updateDto.roles() != null){
             throw new AccessDeniedException("Only administrators can update roles.");
