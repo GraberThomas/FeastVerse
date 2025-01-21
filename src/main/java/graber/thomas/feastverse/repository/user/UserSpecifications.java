@@ -7,6 +7,21 @@ import org.springframework.data.jpa.domain.Specification;
 
 import java.util.Set;
 
+/**
+ * UserSpecifications is a utility class that provides a set of JPA Specifications for querying
+ * the User entity. It includes methods for filtering users based on various attributes such
+ * as role, first name, last name, pseudo, and email.
+ * <p>
+ * These specifications are designed to be used in conjunction with JPA's Criteria API,
+ * enabling dynamic and type-safe query generation.
+ * <p>
+ * Methods:
+ * - hasRole(Set<UserType> roles): Filters users based on their associated roles.
+ * - hasLastName(String lastName): Filters users whose last name matches the specified string, case-insensitively.
+ * - hasFirstName(String firstName): Filters users whose first name matches the specified string, case-insensitively.
+ * - hasPseudo(String pseudo): Filters users whose pseudo matches the specified string, case-insensitively.
+ * - hasEmail(String email): Filters users whose email matches the specified string, case-insensitively.
+ */
 public class UserSpecifications {
 
     public static Specification<User> hasRole(Set<UserType> roles) {

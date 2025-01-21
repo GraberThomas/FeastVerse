@@ -8,6 +8,14 @@ import java.time.LocalDate;
 import java.util.Set;
 import java.util.UUID;
 
+/**
+ * The User class represents an entity for user information in the application.
+ * It is mapped to the "users" table in the database.
+ * <p>
+ * This class includes attributes such as unique identifiers, personal details,
+ * login credentials, and metadata like creation and updated timestamps.
+ * The passwords are excluded from API responses for security reasons.
+ */
 @Entity
 @Table(name = "users")
 public class User {

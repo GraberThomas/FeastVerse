@@ -12,6 +12,28 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import java.time.LocalDate;
 import java.util.Set;
 
+/**
+ * The DatabaseSeeder class is a Spring component responsible for seeding the database
+ * with initial user data specifically for the development environment.
+ * <p>
+ * This class implements the CommandLineRunner interface and is executed automatically
+ * at application startup when the "dev" profile is active. Its primary role is to create
+ * and populate the database with pre-defined users if they do not already exist.
+ * <p>
+ * The seeding process includes creating various user roles such as administrator, moderator,
+ * and standard users. The users' information, including email, pseudo, password, roles, and
+ * other metadata, is provided within the class.
+ * <p>
+ * An encoded password is generated for each user using a PasswordEncoder to ensure secure
+ * password storage.
+ *<p>
+ * An initial administrator account with elevated privileges is also created for
+ * administrative purposes.
+ *<p>
+ * Dependencies:
+ * - UserRepository: Used for accessing and manipulating user data.
+ * - PasswordEncoder: Utilized for encoding user passwords.
+ */
 @Component
 @Profile("dev")
 public class DatabaseSeeder implements CommandLineRunner {

@@ -6,6 +6,16 @@ import java.time.LocalDate;
 import java.util.Set;
 import java.util.UUID;
 
+/**
+ * Data Transfer Object (DTO) representing detailed information for an administrative user's view.
+ * This class is intended to provide comprehensive user details to be consumed by administrative interfaces.
+ * Implements the {@link UserView} interface for basic user identification.
+ * <p>
+ * Key responsibilities of this class include:
+ * - Representing user-related data such as first name, last name, and email.
+ * - Including administrative-specific details like roles and timestamps for record creation and updates.
+ * - Providing getter and setter methods for accessing and modifying user details.
+ */
 public class AdminUserViewDto implements UserView {
     private UUID id;
     private String firstName;

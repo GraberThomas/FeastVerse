@@ -12,6 +12,11 @@ import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * The GlobalExceptionHandler class provides centralized exception handling for the application.
+ * It is annotated with @ControllerAdvice to allow handling exceptions globally across controllers.
+ * This class defines methods to handle specific exceptions and craft custom responses for them.
+ */
 @ControllerAdvice
 public class GlobalExceptionHandler {
 

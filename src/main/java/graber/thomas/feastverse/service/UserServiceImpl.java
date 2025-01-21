@@ -11,6 +11,14 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.*;
 
+/**
+ * Implementation of the UserService interface that provides application-level
+ * operations for managing and retrieving User entities.
+ *<p>
+ * This service interacts with the UserRepository to perform core operations
+ * like creating, updating, deleting, and fetching User data. It also supports
+ * filtering and pagination for retrieving users.
+ */
 @Service
 public class UserServiceImpl implements UserService {
 
