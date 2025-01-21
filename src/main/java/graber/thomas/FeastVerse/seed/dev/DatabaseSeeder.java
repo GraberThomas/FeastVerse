@@ -2,7 +2,7 @@ package graber.thomas.FeastVerse.seed.dev;
 
 import graber.thomas.FeastVerse.model.User;
 import graber.thomas.FeastVerse.model.UserType;
-import graber.thomas.FeastVerse.repository.UserRepository;
+import graber.thomas.FeastVerse.repository.user.UserRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -70,6 +70,117 @@ public class DatabaseSeeder implements CommandLineRunner {
             testUser.setCreatedDate(LocalDate.now());
             testUser.setUpdatedDate(LocalDate.now());
             this.userRepository.save(testUser);
+
+            User mod1 = new User();
+            mod1.setEmail("vincent.tastique@feastverse.com");
+            mod1.setPseudo("vincent.tastique");
+            mod1.setPassword(encoder.encode("ModUser1!"));
+            mod1.setFirstName("Vincent");
+            mod1.setLastName("Tastique");
+            mod1.setRoles(Set.of(UserType.STANDARD, UserType.MODERATOR));
+            mod1.setCreatedDate(LocalDate.now());
+            mod1.setUpdatedDate(LocalDate.now());
+            this.userRepository.save(mod1);
+
+            User mod2 = new User();
+            mod2.setEmail("hugo.gourmand@feastverse.com");
+            mod2.setPseudo("hugo.gourmand");
+            mod2.setPassword(encoder.encode("ModUser2!"));
+            mod2.setFirstName("Hugo");
+            mod2.setLastName("Gourmand");
+            mod2.setRoles(Set.of(UserType.STANDARD, UserType.MODERATOR));
+            mod2.setCreatedDate(LocalDate.now());
+            mod2.setUpdatedDate(LocalDate.now());
+            this.userRepository.save(mod2);
+
+            User user1 = new User();
+            user1.setEmail("paul.lent@feastverse.com");
+            user1.setPseudo("paul.lent");
+            user1.setPassword(encoder.encode("Standard1!"));
+            user1.setFirstName("Paul");
+            user1.setLastName("Lent");
+            user1.setRoles(Set.of(UserType.STANDARD));
+            user1.setCreatedDate(LocalDate.now());
+            user1.setUpdatedDate(LocalDate.now());
+            this.userRepository.save(user1);
+
+            User user2 = new User();
+            user2.setEmail("claire.ment@feastverse.com");
+            user2.setPseudo("claire.ment");
+            user2.setPassword(encoder.encode("Standard2!"));
+            user2.setFirstName("Claire");
+            user2.setLastName("Ment");
+            user2.setRoles(Set.of(UserType.STANDARD));
+            user2.setCreatedDate(LocalDate.now());
+            user2.setUpdatedDate(LocalDate.now());
+            this.userRepository.save(user2);
+
+            User user3 = new User();
+            user3.setEmail("ella.gantine@feastverse.com");
+            user3.setPseudo("ella.gantine");
+            user3.setPassword(encoder.encode("Standard3!"));
+            user3.setFirstName("Ella");
+            user3.setLastName("Gantine");
+            user3.setRoles(Set.of(UserType.STANDARD));
+            user3.setCreatedDate(LocalDate.now());
+            user3.setUpdatedDate(LocalDate.now());
+            this.userRepository.save(user3);
+
+            User user4 = new User();
+            user4.setEmail("guy.tare@feastverse.com");
+            user4.setPseudo("guy.tare");
+            user4.setPassword(encoder.encode("Standard4!"));
+            user4.setFirstName("Guy");
+            user4.setLastName("Tare");
+            user4.setRoles(Set.of(UserType.STANDARD));
+            user4.setCreatedDate(LocalDate.now());
+            user4.setUpdatedDate(LocalDate.now());
+            this.userRepository.save(user4);
+
+            User user5 = new User();
+            user5.setEmail("anne.anas@feastverse.com");
+            user5.setPseudo("anne.anas");
+            user5.setPassword(encoder.encode("Standard5!"));
+            user5.setFirstName("Anne");
+            user5.setLastName("Anas");
+            user5.setRoles(Set.of(UserType.STANDARD));
+            user5.setCreatedDate(LocalDate.now());
+            user5.setUpdatedDate(LocalDate.now());
+            this.userRepository.save(user5);
+
+            User user6 = new User();
+            user6.setEmail("julie.enn@feastverse.com");
+            user6.setPseudo("julie.enn");
+            user6.setPassword(encoder.encode("Standard6!"));
+            user6.setFirstName("Julie");
+            user6.setLastName("Enn");
+            user6.setRoles(Set.of(UserType.STANDARD));
+            user6.setCreatedDate(LocalDate.now());
+            user6.setUpdatedDate(LocalDate.now());
+            this.userRepository.save(user6);
+
+            User user7 = new User();
+            user7.setEmail("leo.nardo@feastverse.com");
+            user7.setPseudo("leo.nardo");
+            user7.setPassword(encoder.encode("Standard7!"));
+            user7.setFirstName("Leo");
+            user7.setLastName("Nardo");
+            user7.setRoles(Set.of(UserType.STANDARD));
+            user7.setCreatedDate(LocalDate.now());
+            user7.setUpdatedDate(LocalDate.now());
+            this.userRepository.save(user7);
+
+            User user8 = new User();
+            user8.setEmail("ade.le@feastverse.com");
+            user8.setPseudo("ade.le");
+            user8.setPassword(encoder.encode("Standard8!"));
+            user8.setFirstName("Adele");
+            user8.setLastName("Le");
+            user8.setRoles(Set.of(UserType.STANDARD));
+            user8.setCreatedDate(LocalDate.now());
+            user8.setUpdatedDate(LocalDate.now());
+            this.userRepository.save(user8);
+
 
         }
     }
