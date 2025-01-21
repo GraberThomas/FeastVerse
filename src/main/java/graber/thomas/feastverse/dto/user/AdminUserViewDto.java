@@ -88,4 +88,8 @@ public class AdminUserViewDto implements UserView {
     public void setUpdatedDate(LocalDate updatedDate) {
         this.updatedDate = updatedDate;
     }
+
+    public void setId(UUID id) {
+        this.id = id;
+    }
 }
