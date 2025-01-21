@@ -33,10 +33,11 @@ public class MyUserDetailsService implements UserDetailsService {
                 .collect(Collectors.toList());
 
         // -- Return a new UserDetails object
-        return new org.springframework.security.core.userdetails.User( // This is the building of spring boot PRINCIPAL USER
-                user.getEmail(), // Email is our username
-                user.getPassword(), // The password of our user
-                authorities //
+        return new CustomUserDetails(
+                user.getId(),
+                user.getEmail(),
+                user.getPassword(),
+                authorities
         );
     }
 }
