@@ -1,14 +1,15 @@
 package graber.thomas.FeastVerse.service;
 import graber.thomas.FeastVerse.model.User;
 import graber.thomas.FeastVerse.model.UserType;
-import graber.thomas.FeastVerse.repository.UserRepository;
+import graber.thomas.FeastVerse.repository.user.UserRepository;
+import graber.thomas.FeastVerse.repository.user.UserSpecifications;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -31,15 +32,31 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Page<User> getAllByRole(String role, Pageable pageable) {
-        Set<Integer> roleOrdinals = Arrays.stream(role.split(","))
-                .map(String::trim)
-                .map(this::convertRoleToUserType)
-                .map(UserType::ordinal)
-                .collect(Collectors.toSet());
+    public Page<User> getAllFiltered(String role, String lastName, String firstName, String pseudo, String email, Pageable pageable) {
+        Specification<User> spec = Specification.where(null);
 
-        return userRepository.findUsersByRoles(roleOrdinals, pageable);
+        if (role != null) {
+            UserType userType = convertRoleToUserType(role);
+            Set<UserType> roles = Collections.singleton(userType);
+            spec = spec.and(UserSpecifications.hasRole(roles));
+        }
+        if (lastName != null) {
+            spec = spec.and(UserSpecifications.hasLastName(lastName));
+        }
+        if (firstName != null) {
+            spec = spec.and(UserSpecifications.hasFirstName(firstName));
+        }
+        if (pseudo != null) {
+            spec = spec.and(UserSpecifications.hasPseudo(pseudo));
+        }
+        if(email != null) {
+            spec = spec.and(UserSpecifications.hasEmail(email));
+        }
+
+        // Appeler le repository avec la spécification
+        return userRepository.findAll(spec, pageable);
     }
+
 
 
 

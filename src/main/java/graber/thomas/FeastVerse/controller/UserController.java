@@ -48,6 +48,10 @@ public class UserController {
     @GetMapping
     public Page<UserView> getAllUsers(
             @RequestParam(required = false) String role,
+            @RequestParam(required = false) String lastName,
+            @RequestParam(required = false) String firstName,
+            @RequestParam(required = false) String pseudo,
+            @RequestParam(required = false) String email,
             Pageable pageable,
             Authentication authentication
     ) {
@@ -56,12 +60,12 @@ public class UserController {
                         .anyMatch(grantedAuthority ->
                                 grantedAuthority.getAuthority().equals("ROLE_ADMINISTRATOR"));
 
-        if(role != null){
+        if(role != null || lastName != null || firstName != null || pseudo != null || email != null) {
             if(!isAdmin){
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only administrators can access roles.");
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only administrators can use filter on users.");
             }
             try {
-                return userService.getAllByRole(role, pageable).map(userMapper::toAdminUserDto);
+                return userService.getAllFiltered(role, lastName, firstName, pseudo, email, pageable).map(userMapper::toAdminUserDto);
             } catch (IllegalArgumentException e) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
             }

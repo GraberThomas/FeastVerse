@@ -24,11 +24,7 @@ public interface UserService {
      */
     Page<User> getAll(Pageable pageable);
 
-    /**
-     * Get all users by role, paginated
-     * @return The users who have the role, paginated
-     */
-    Page<User> getAllByRole(String role, Pageable pageable);
+    Page<User> getAllFiltered(String role, String lastName, String firstName, String pseudo, String email, Pageable pageable);
 
     /**
      * Get user by username (username)
