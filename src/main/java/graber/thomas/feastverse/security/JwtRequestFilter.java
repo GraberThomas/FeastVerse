@@ -7,58 +7,62 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.*;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.UUID;
 
 @Component
 public class JwtRequestFilter extends OncePerRequestFilter {
 
-    @Autowired // or injected our bean in constructor without autowired
-    private UserDetailsService userDetailsService;
+    @Autowired
+    private MyUserDetailsService userDetailsService;
 
-    @Autowired // or injected our bean in constructor without autowired
+    @Autowired
     private JwtUtil jwtUtil;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
-            throws ServletException, IOException {
+    protected void doFilterInternal(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            FilterChain chain
+    ) throws ServletException, IOException {
 
-        // -- Get the Authorization header from the request
-        // Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ
         final String authorizationHeader = request.getHeader("Authorization");
 
-        // -- Initialize username and jwt variables
-        String username = null;
         String jwt = null;
+        UUID userId = null;
 
-        // -- Extract the jwt token from the Authorization header
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-            // -- Extract the jwt token from the Authorization header after the "Bearer " string
             jwt = authorizationHeader.substring(7);
-            // -- Extract the username from the jwt token
-            username = jwtUtil.extractUsername(jwt);
+            // Extraction de l’UUID à partir du token
+            userId = jwtUtil.extractUserId(jwt);
         }
 
-        // Get books/1 => doFilterInternal => Get JWT from header => Build Spring security context with user principal and roles
-        // @PreAuthorize("hasRole('ROLE_VIEWER') or hasRole('ROLE_EDITOR')")
-        // Books va appeler d'autres services et que ces autres services
+        // Si on a un userId valide et pas encore d’authentification dans le contexte
+        if (userId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            // Charge l’utilisateur en base via l’ID
+            UserDetails userDetails = userDetailsService.loadUserById(userId);
 
-            UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
+            // Valide que le token correspond bien à l’ID de cet utilisateur
+            if (jwtUtil.validateToken(jwt, userId)) {
 
-            if (jwtUtil.validateToken(jwt, userDetails.getUsername())) {
+                UsernamePasswordAuthenticationToken authToken =
+                        new UsernamePasswordAuthenticationToken(
+                                userDetails,
+                                null,
+                                userDetails.getAuthorities()
+                        );
+                authToken.setDetails(
+                        new WebAuthenticationDetailsSource().buildDetails(request)
+                );
 
-                UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
-                        userDetails, null, userDetails.getAuthorities());
-                usernamePasswordAuthenticationToken
-                        .setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+                // Mise en place dans le contexte de sécurité
+                SecurityContextHolder.getContext().setAuthentication(authToken);
             }
         }
         chain.doFilter(request, response);

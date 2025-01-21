@@ -5,6 +5,7 @@ import graber.thomas.feastverse.dto.auth.AuthenticationRequestDto;
 import graber.thomas.feastverse.exception.UserAlreadyExistsException;
 import graber.thomas.feastverse.model.User;
 import graber.thomas.feastverse.model.UserType;
+import graber.thomas.feastverse.security.CustomUserDetails;
 import graber.thomas.feastverse.security.JwtUtil;
 import graber.thomas.feastverse.security.MyUserDetailsService;
 import graber.thomas.feastverse.service.UserService;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 
 @Tag(name = "Auth", description = "Endpoints for authentification")
@@ -69,10 +71,18 @@ public class AuthController {
         }
 
         final UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequestDto.username());
-        final String jwt = jwtUtil.generateToken(userDetails.getUsername());
+        // Ancienne version : on utilisait userDetails.getUsername(), qui est l’email ou le username.
+        // final String jwt = jwtUtil.generateToken(userDetails.getUsername());
+
+        // Nouvelle version : on cast en CustomUserDetails pour récupérer l’UUID
+        CustomUserDetails customUserDetails = (CustomUserDetails) userDetails;
+        final UUID userId = customUserDetails.getId(); // On récupère ici l’UUID stocké dans CustomUserDetails
+
+        final String jwt = jwtUtil.generateToken(userId);
 
         return ResponseEntity.ok(Map.of("accessToken", jwt));
     }
+
 
     @Operation(
             summary = "User Registration",

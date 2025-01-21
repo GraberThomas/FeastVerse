@@ -160,6 +160,11 @@ public class UserServiceImpl implements UserService {
         this.userRepository.delete(user);
     }
 
+    @Override
+    public Optional<User> getById(UUID id) {
+        return Optional.ofNullable(this.userRepository.findUserById(id));
+    }
+
     private UserType convertRoleToUserType(String role) throws IllegalArgumentException {
         try {
             return UserType.valueOf(role.toUpperCase());

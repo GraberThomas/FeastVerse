@@ -72,4 +72,6 @@ public interface UserService {
      * @param user the user to delete
      */
     void delete(User user);
+
+    Optional<User> getById(UUID id);
 }

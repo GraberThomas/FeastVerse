@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
+import java.util.UUID;
 import java.util.function.Function;
 
 @Component
@@ -18,56 +19,46 @@ public class JwtUtil {
 
     @Value("${jwt.secret}")
     private String jwtSecret;
+
     @Value("${jwt.expiration}")
     private int jwtExpirationMs;
 
     private SecretKey key;
 
-    // Server started with values (secret, exp), Instantiate JWT Util and init
-
-    /**
-     * Initializes the key after the class is instantiated and the jwtSecret is injected,
-     * preventing the repeated creation of the key and enhancing performance
-     */
     @PostConstruct
     public void init() {
         this.key = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
     }
 
-    // Generate JWT token
-    public String generateToken(String username) {
+    /**
+     * Génère un token JWT dont le "subject" (`sub`) est l’UUID de l’utilisateur.
+     */
+    public String generateToken(UUID userId) {
         return Jwts.builder()
-                .setSubject(username) // keyword => sub
-                .setIssuedAt(new Date()) // keyword => iat
-                .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs)) // keyword => exp
+                .setSubject(userId.toString())  // Le Subject est l’UUID
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
 
     /**
-     * Extract username from token
-     * @param token the token
-     * @return the username
+     * Extrait l’UUID (sous forme de String) et le convertit en UUID Java.
      */
-    public String extractUsername(String token) {
-        return extractClaim(token, Claims::getSubject);
+    public UUID extractUserId(String token) {
+        String userIdString = extractClaim(token, Claims::getSubject);
+        return UUID.fromString(userIdString);
     }
 
     /**
-     * Extract expiration date from token
-     * @param token the token
-     * @return the expiration date
+     * Extrait la date d’expiration depuis le token.
      */
     public Date extractExpiration(String token) {
         return extractClaim(token, Claims::getExpiration);
     }
 
     /**
-     * Extract claim from token
-     * @param token the token
-     * @param claimsResolver the claims resolver
-     * @param <T> the type of the claim
-     * @return the claim
+     * Méthode générique pour extraire un claim.
      */
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);
@@ -75,9 +66,7 @@ public class JwtUtil {
     }
 
     /**
-     * Extract all claims from token
-     * @param token the token
-     * @return the claims
+     * Extrait tous les claims depuis le token.
      */
     private Claims extractAllClaims(String token) {
         return Jwts.parser()
@@ -87,12 +76,19 @@ public class JwtUtil {
                 .getPayload();
     }
 
+    /**
+     * Vérifie si le token est expiré.
+     */
     private Boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
     }
 
-    public Boolean validateToken(String token, String username) {
-        final String extractedUsername = extractUsername(token);
-        return (extractedUsername.equals(username) && !isTokenExpired(token));
+    /**
+     * Valide le token en comparant l’UUID du token avec l’UUID de l’utilisateur
+     * et en vérifiant la non-expiration.
+     */
+    public Boolean validateToken(String token, UUID userId) {
+        final UUID extractedUserId = extractUserId(token);
+        return (extractedUserId.equals(userId) && !isTokenExpired(token));
     }
 }

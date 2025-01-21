@@ -4,12 +4,12 @@ import graber.thomas.feastverse.model.User;
 import graber.thomas.feastverse.service.UserService;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.core.userdetails.*;
+
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -20,19 +20,37 @@ public class MyUserDetailsService implements UserDetailsService {
         this.userService = userService;
     }
 
+    /**
+     * Méthode par défaut — on peut encore l’utiliser si nécessaire pour du login
+     * (ex: username = email).
+     */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userService.getByUsername(username)
-                    .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+                .orElseThrow(() -> new UsernameNotFoundException("User not found by username: " + username));
 
-        // RBAC => ROLE BASED ACCESS CONTROL
-        // -- Convert user roles to GrantedAuthority objects of spring security
-        // -- This is required by spring security to check user roles in security config
+        return buildUserDetails(user);
+    }
+
+    /**
+     * Nouvelle méthode pour charger l’utilisateur par son UUID.
+     */
+    public UserDetails loadUserById(UUID id) throws UsernameNotFoundException {
+        User user = userService.getById(id)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found by id: " + id));
+
+        return buildUserDetails(user);
+    }
+
+    /**
+     * Factorise la construction de l’objet UserDetails.
+     */
+    private UserDetails buildUserDetails(User user) {
         List<GrantedAuthority> authorities = user.getRoles().stream()
                 .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
                 .collect(Collectors.toList());
 
-        // -- Return a new UserDetails object
+        // CustomUserDetails stocke déjà un UUID, l’email en “username”, etc.
         return new CustomUserDetails(
                 user.getId(),
                 user.getEmail(),
