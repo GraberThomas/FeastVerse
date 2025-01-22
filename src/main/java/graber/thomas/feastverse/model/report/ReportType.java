@@ -9,5 +9,6 @@ public enum ReportType {
     OFF_TOPIC,
     HARASSMENT,
     LOW_QUALITY,
-    TECHNICAL_ISSUE
+    TECHNICAL_ISSUE,
+    OTHER
 }
