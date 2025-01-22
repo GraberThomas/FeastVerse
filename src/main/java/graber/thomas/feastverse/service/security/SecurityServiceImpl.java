@@ -1,8 +1,11 @@
 package graber.thomas.feastverse.service.security;
 
+import graber.thomas.feastverse.security.CustomUserDetails;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+
+import java.util.UUID;
 
 @Service
 public class SecurityServiceImpl implements SecurityService {
@@ -15,11 +18,12 @@ public class SecurityServiceImpl implements SecurityService {
     }
 
     @Override
-    public String getCurrentUserId() {
+    public UUID getCurrentUserId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null) {
+        if (authentication == null || !(authentication.getPrincipal() instanceof CustomUserDetails userDetails)) {
             return null;
         }
-        return authentication.getName(); // ou un autre identifiant selon votre configuration
+
+        return userDetails.getId();
     }
 }
