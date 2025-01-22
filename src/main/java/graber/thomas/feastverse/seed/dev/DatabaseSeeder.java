@@ -137,6 +137,7 @@ public class DatabaseSeeder implements CommandLineRunner {
             report.setMessage("This user has inappropriate comments!");
             report.setType(ReportType.INAPPROPRIATE_CONTENT);
             report.setCreatedDate(LocalDate.of(2024, 12, 10));
+            report.setResolved(true);
             this.reportRepository.save(report);
 
             User user2 = new User();
