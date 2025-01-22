@@ -7,6 +7,7 @@ import java.util.UUID;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
+@DiscriminatorColumn(name = "targetType", discriminatorType = DiscriminatorType.STRING)
 public abstract class Reportable {
     @Id
     @GeneratedValue

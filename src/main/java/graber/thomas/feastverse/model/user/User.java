@@ -3,11 +3,9 @@ package graber.thomas.feastverse.model.user;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import graber.thomas.feastverse.model.report.Reportable;
 import jakarta.persistence.*;
-import org.hibernate.annotations.ColumnDefault;
 
 import java.time.LocalDate;
 import java.util.Set;
-import java.util.UUID;
 
 /**
  * The User class represents an entity for user information in the application.
@@ -19,6 +17,7 @@ import java.util.UUID;
  */
 @Entity
 @Table(name = "users")
+@DiscriminatorValue("USER")
 public class User extends Reportable {
     @Column(nullable = false)
     private String firstName;
