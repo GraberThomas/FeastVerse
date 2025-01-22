@@ -1,6 +1,7 @@
-package graber.thomas.feastverse.model;
+package graber.thomas.feastverse.model.user;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import graber.thomas.feastverse.model.report.Reportable;
 import jakarta.persistence.*;
 import org.hibernate.annotations.ColumnDefault;
 
@@ -18,12 +19,7 @@ import java.util.UUID;
  */
 @Entity
 @Table(name = "users")
-public class User {
-    @Id
-    @GeneratedValue
-    @ColumnDefault(value = "gen_random_uuid()")
-    private UUID id;
-
+public class User extends Reportable {
     @Column(nullable = false)
     private String firstName;
 
@@ -53,8 +49,7 @@ public class User {
     public User() {
     }
 
-    public User(UUID id, String firstName, String lastName, String email, String password, Set<UserType> roles, LocalDate createdDate, LocalDate updatedDate) {
-        this.id = id;
+    public User(String firstName, String lastName, String email, String password, Set<UserType> roles, LocalDate createdDate, LocalDate updatedDate) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
@@ -62,14 +57,6 @@ public class User {
         this.roles = roles;
         this.createdDate = createdDate;
         this.updatedDate = updatedDate;
-    }
-
-    public UUID getId() {
-        return id;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
     }
 
     public String getFirstName() {
