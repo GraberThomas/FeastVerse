@@ -1,7 +1,10 @@
 package graber.thomas.feastverse.seed.dev;
 
+import graber.thomas.feastverse.model.report.Report;
+import graber.thomas.feastverse.model.report.ReportType;
 import graber.thomas.feastverse.model.user.User;
 import graber.thomas.feastverse.model.user.UserType;
+import graber.thomas.feastverse.repository.report.ReportRepository;
 import graber.thomas.feastverse.repository.user.UserRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
@@ -39,10 +42,12 @@ import java.util.Set;
 public class DatabaseSeeder implements CommandLineRunner {
 
     private final UserRepository userRepository;
+    private final ReportRepository reportRepository;
     private final PasswordEncoder encoder;
 
-    public DatabaseSeeder(UserRepository userRepository) {
+    public DatabaseSeeder(UserRepository userRepository, ReportRepository reportRepository, PasswordEncoder encoder) {
         this.userRepository = userRepository;
+        this.reportRepository = reportRepository;
         this.encoder = new BCryptPasswordEncoder();
     }
 
@@ -71,27 +76,27 @@ public class DatabaseSeeder implements CommandLineRunner {
             testUser.setUpdatedDate(LocalDate.now());
             this.userRepository.save(testUser);
 
-            testUser = new User();
-            testUser.setEmail("pcruel_fake@gmail.com");
-            testUser.setPseudo("pcruel");
-            testUser.setPassword(encoder.encode("TestUser2!"));
-            testUser.setFirstName("Patrick");
-            testUser.setLastName("Cruel");
-            testUser.setRoles(Set.of(UserType.STANDARD));
-            testUser.setCreatedDate(LocalDate.now());
-            testUser.setUpdatedDate(LocalDate.now());
-            this.userRepository.save(testUser);
+            User testUser2 = new User();
+            testUser2.setEmail("pcruel_fake@gmail.com");
+            testUser2.setPseudo("pcruel");
+            testUser2.setPassword(encoder.encode("TestUser2!"));
+            testUser2.setFirstName("Patrick");
+            testUser2.setLastName("Cruel");
+            testUser2.setRoles(Set.of(UserType.STANDARD));
+            testUser2.setCreatedDate(LocalDate.now());
+            testUser2.setUpdatedDate(LocalDate.now());
+            this.userRepository.save(testUser2);
 
-            testUser = new User();
-            testUser.setEmail("emacron@gmail.com");
-            testUser.setPseudo("emacron");
-            testUser.setPassword(encoder.encode("TestUser3!"));
-            testUser.setFirstName("Emmanuel");
-            testUser.setLastName("Macron");
-            testUser.setRoles(Set.of(UserType.STANDARD, UserType.MODERATOR));
-            testUser.setCreatedDate(LocalDate.now());
-            testUser.setUpdatedDate(LocalDate.now());
-            this.userRepository.save(testUser);
+            User testUser3 = new User();
+            testUser3.setEmail("emacron@gmail.com");
+            testUser3.setPseudo("emacron");
+            testUser3.setPassword(encoder.encode("TestUser3!"));
+            testUser3.setFirstName("Emmanuel");
+            testUser3.setLastName("Macron");
+            testUser3.setRoles(Set.of(UserType.STANDARD, UserType.MODERATOR));
+            testUser3.setCreatedDate(LocalDate.now());
+            testUser3.setUpdatedDate(LocalDate.now());
+            this.userRepository.save(testUser3);
 
             User mod1 = new User();
             mod1.setEmail("vincent.tastique@feastverse.com");
@@ -126,6 +131,14 @@ public class DatabaseSeeder implements CommandLineRunner {
             user1.setUpdatedDate(LocalDate.now());
             this.userRepository.save(user1);
 
+            Report report = new Report();
+            report.setTarget(user1);
+            report.setReporter(testUser2);
+            report.setMessage("This user has inappropriate comments!");
+            report.setType(ReportType.INAPPROPRIATE_CONTENT);
+            report.setCreatedDate(LocalDate.of(2024, 12, 10));
+            this.reportRepository.save(report);
+
             User user2 = new User();
             user2.setEmail("claire.ment@feastverse.com");
             user2.setPseudo("claire.ment");
@@ -147,6 +160,22 @@ public class DatabaseSeeder implements CommandLineRunner {
             user3.setCreatedDate(LocalDate.now());
             user3.setUpdatedDate(LocalDate.now());
             this.userRepository.save(user3);
+
+            Report report2 = new Report();
+            report2.setTarget(user3);
+            report2.setReporter(testUser2);
+            report2.setMessage("This user is racist!");
+            report2.setType(ReportType.HATE_SPEECH);
+            report2.setCreatedDate(LocalDate.of(2025, 1, 8));
+            this.reportRepository.save(report2);
+
+            Report report3 = new Report();
+            report3.setTarget(user2);
+            report3.setReporter(user3);
+            report3.setType(ReportType.MISINFORMATION);
+            report3.setCreatedDate(LocalDate.of(2025, 1, 10));
+            this.reportRepository.save(report3);
+
 
             User user4 = new User();
             user4.setEmail("guy.tare@feastverse.com");
@@ -203,7 +232,13 @@ public class DatabaseSeeder implements CommandLineRunner {
             user8.setUpdatedDate(LocalDate.now());
             this.userRepository.save(user8);
 
-
+            Report report4 = new Report();
+            report4.setTarget(user7);
+            report4.setReporter(user8);
+            report4.setMessage("Post only protected recipes");
+            report4.setType(ReportType.COPYRIGHT_VIOLATION);
+            report4.setCreatedDate(LocalDate.of(2024, 10, 3));
+            this.reportRepository.save(report4);
         }
     }
 }
