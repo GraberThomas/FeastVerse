@@ -30,33 +30,33 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<Report> getAll() {
-        return List.of();
+    public Page<Report> getAll(Pageable pageable) {
+        return this.reportRepository.findAll(pageable);
     }
 
     @Override
-    public List<Report> getUnresolvedReports() {
-        return List.of();
+    public Page<Report> getUnresolvedReports(Pageable pageable) {
+        return null;
     }
 
     @Override
-    public List<Report> getResolvedReports() {
-        return List.of();
+    public Page<Report> getResolvedReports(Pageable pageable) {
+        return null;
     }
 
     @Override
-    public List<Report> getByType(ReportType type) {
-        return List.of();
+    public Page<Report> getByType(Pageable pageable, ReportType type) {
+        return null;
     }
 
     @Override
-    public List<Report> getByTarget(UUID targetId) {
-        return List.of();
+    public Page<Report> getByTarget(Pageable pageable, UUID targetId) {
+        return null;
     }
 
     @Override
-    public List<Report> getByReporter(UUID reporterId) {
-        return List.of();
+    public Page<Report> getByReporter(Pageable pageable, UUID reporterId) {
+        return null;
     }
 
     @Override

@@ -21,21 +21,21 @@ public interface ReportService {
     void delete(UUID id);
 
 
-    List<Report> getAll();
+    Page<Report> getAll(Pageable pageable);
 
 
-    List<Report> getUnresolvedReports();
+    Page<Report> getUnresolvedReports(Pageable pageable);
 
-    List<Report> getResolvedReports();
-
-
-    List<Report> getByType(ReportType type);
+    Page<Report> getResolvedReports(Pageable pageable);
 
 
-    List<Report> getByTarget(UUID targetId);
+    Page<Report> getByType(Pageable pageable, ReportType type);
 
 
-    List<Report> getByReporter(UUID reporterId);
+    Page<Report> getByTarget(Pageable pageable, UUID targetId);
+
+
+    Page<Report> getByReporter(Pageable pageable, UUID reporterId);
 
     Report markAsResolved(UUID id);
 
