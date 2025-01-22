@@ -28,7 +28,7 @@ public interface ReportService {
     void delete(UUID id);
 
 
-    Page<Report> getAll(Pageable pageable);
+    Page<Report> getAll(Boolean resolved, ReportType type, UUID targetId, User reporter, Pageable pageable);
 
 
     Page<Report> getUnresolvedReports(Pageable pageable);

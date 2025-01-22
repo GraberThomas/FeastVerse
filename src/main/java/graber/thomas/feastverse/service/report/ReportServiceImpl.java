@@ -6,8 +6,10 @@ import graber.thomas.feastverse.model.report.ReportType;
 import graber.thomas.feastverse.model.report.Reportable;
 import graber.thomas.feastverse.model.user.User;
 import graber.thomas.feastverse.repository.report.ReportRepository;
+import graber.thomas.feastverse.repository.report.ReportSpecifications;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -57,8 +59,13 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public Page<Report> getAll(Pageable pageable) {
-        return this.reportRepository.findAll(pageable);
+    public Page<Report> getAll(Boolean resolved, ReportType type, UUID targetId, User reporter, Pageable pageable) {
+        Specification<Report> spec = Specification.where(ReportSpecifications.isResolved(resolved))
+                .and(ReportSpecifications.hasType(type))
+                .and(ReportSpecifications.hasTargetId(targetId))
+                .and(ReportSpecifications.hasReporter(reporter));
+
+        return reportRepository.findAll(spec, pageable);
     }
 
     @Override

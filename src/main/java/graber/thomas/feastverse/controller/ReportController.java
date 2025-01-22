@@ -50,8 +50,15 @@ public class ReportController {
 
     @PreAuthorize("hasAnyRole('ROLE_MODERATOR', 'ROLE_ADMINISTRATOR')")
     @GetMapping
-    public Page<ReportViewDTO> getAll(Pageable pageable) {
-        return reportService.getAll(pageable).map(reportMapper::toReportView);
+    public Page<ReportViewDTO> getAll(
+            @RequestParam(required = false) Boolean resolved,
+            @RequestParam(required = false) ReportType type,
+            @RequestParam(required = false) UUID targetId,
+            @RequestParam(required = false) UUID reporterId,
+            Pageable pageable
+    ) {
+        User reporter = reporterId != null ? userService.getById(reporterId).orElse(null) : null;
+        return reportService.getAll(resolved, type, targetId, reporter, pageable).map(reportMapper::toReportView);
     }
 
     @PreAuthorize("hasAnyRole('ROLE_MODERATOR', 'ROLE_ADMINISTRATOR')")
