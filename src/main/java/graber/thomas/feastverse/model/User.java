@@ -2,6 +2,7 @@ package graber.thomas.feastverse.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotEmpty;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.time.LocalDate;
@@ -23,21 +24,31 @@ public class User {
     @GeneratedValue
     @ColumnDefault(value = "gen_random_uuid()")
     private UUID id;
+
+    @Column(nullable = false)
     private String firstName;
+
+    @Column(nullable = false)
     private String lastName;
+
+    @Column(unique = true, nullable = false)
     private String email;
 
     @Column(unique = true, nullable = false)
     private String pseudo;
 
 
+    @Column(nullable = false)
     @JsonIgnore // -- To ignore password in api response
     private String password;
 
+    @Column(nullable = false)
     @ElementCollection(fetch = FetchType.EAGER)
     private Set<UserType> roles;
 
+    @Column(nullable = false)
     private LocalDate createdDate;
+
     private LocalDate updatedDate;
 
     public User() {
