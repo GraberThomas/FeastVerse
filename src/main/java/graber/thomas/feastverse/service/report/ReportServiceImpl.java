@@ -1,22 +1,49 @@
 package graber.thomas.feastverse.service.report;
 
+import graber.thomas.feastverse.dto.reports.ReportCreateDto;
 import graber.thomas.feastverse.model.report.Report;
 import graber.thomas.feastverse.model.report.ReportType;
+import graber.thomas.feastverse.model.report.Reportable;
+import graber.thomas.feastverse.model.user.User;
+import graber.thomas.feastverse.repository.report.ReportRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+@Service
 public class ReportServiceImpl implements ReportService {
 
-    @Override
-    public Optional<Report> get(UUID id) {
-        return Optional.empty();
+    private final ReportRepository reportRepository;
+
+    public ReportServiceImpl(ReportRepository reportRepository) {
+        this.reportRepository = reportRepository;
     }
 
     @Override
-    public Optional<Report> create(Report report) {
-        return Optional.empty();
+    public List<ReportType> getReportTypes() {
+        return List.of(ReportType.values());
+    }
+
+    @Override
+    public Optional<Report> get(UUID id) {
+        return this.reportRepository.findById(id);
+    }
+
+    @Override
+    public Optional<Report> create(ReportCreateDto reportCreateDto, User reporter ,Reportable reportableTarget) {
+        Report report = new Report();
+        report.setTarget(reportableTarget);
+        report.setReporter(reporter);
+        report.setType(reportCreateDto.type());
+        report.setCreatedDate(LocalDate.now());
+        report.setResolved(false);
+        report.setMessage(reportCreateDto.message());
+        return Optional.of(reportRepository.save(report));
     }
 
     @Override

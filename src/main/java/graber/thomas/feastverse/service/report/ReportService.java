@@ -1,7 +1,12 @@
 package graber.thomas.feastverse.service.report;
 
+import graber.thomas.feastverse.dto.reports.ReportCreateDto;
 import graber.thomas.feastverse.model.report.Report;
 import graber.thomas.feastverse.model.report.ReportType;
+import graber.thomas.feastverse.model.report.Reportable;
+import graber.thomas.feastverse.model.user.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
@@ -9,10 +14,12 @@ import java.util.UUID;
 
 public interface ReportService {
 
+    List<ReportType> getReportTypes();
+
     Optional<Report> get(UUID id);
 
 
-    Optional<Report> create(Report report);
+    public Optional<Report> create(ReportCreateDto reportCreateDto, User reporter , Reportable reportableTarget);
 
 
     Optional<Report> update(UUID id, Report report);
