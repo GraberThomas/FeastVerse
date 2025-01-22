@@ -1,7 +1,7 @@
 package graber.thomas.feastverse.dto.auth;
 
-import graber.thomas.feastverse.dto.auth.validation.ValidEmail;
-import graber.thomas.feastverse.dto.auth.validation.ValidPassword;
+import graber.thomas.feastverse.dto.validation.ValidEmail;
+import graber.thomas.feastverse.dto.validation.ValidPassword;
 import jakarta.validation.constraints.NotBlank;
 
 /**

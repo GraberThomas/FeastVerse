@@ -1,4 +1,4 @@
-package graber.thomas.feastverse.dto.auth.validation;
+package graber.thomas.feastverse.dto.validation;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
