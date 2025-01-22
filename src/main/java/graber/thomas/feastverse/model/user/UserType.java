@@ -1,4 +1,4 @@
-package graber.thomas.feastverse.model;
+package graber.thomas.feastverse.model.user;
 
 /**
  * Represents the various types of users in the application.

@@ -1,4 +1,4 @@
-package graber.thomas.feastverse.service;
+package graber.thomas.feastverse.service.security;
 
 public interface SecurityService {
     boolean hasRole(String role);

@@ -1,9 +1,10 @@
-package graber.thomas.feastverse.service;
+package graber.thomas.feastverse.service.user;
 import graber.thomas.feastverse.dto.user.UpdateDto;
-import graber.thomas.feastverse.model.User;
-import graber.thomas.feastverse.model.UserType;
+import graber.thomas.feastverse.model.user.User;
+import graber.thomas.feastverse.model.user.UserType;
 import graber.thomas.feastverse.repository.user.UserRepository;
 import graber.thomas.feastverse.repository.user.UserSpecifications;
+import graber.thomas.feastverse.service.security.SecurityService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;

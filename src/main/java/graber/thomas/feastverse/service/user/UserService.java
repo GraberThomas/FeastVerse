@@ -1,7 +1,7 @@
-package graber.thomas.feastverse.service;
+package graber.thomas.feastverse.service.user;
 
 import graber.thomas.feastverse.dto.user.UpdateDto;
-import graber.thomas.feastverse.model.User;
+import graber.thomas.feastverse.model.user.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

@@ -1,7 +1,7 @@
 package graber.thomas.feastverse.repository.user;
 
-import graber.thomas.feastverse.model.User;
-import graber.thomas.feastverse.model.UserType;
+import graber.thomas.feastverse.model.user.User;
+import graber.thomas.feastverse.model.user.UserType;
 import jakarta.persistence.criteria.Join;
 import org.springframework.data.jpa.domain.Specification;
 

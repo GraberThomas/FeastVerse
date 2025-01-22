@@ -1,6 +1,6 @@
 package graber.thomas.feastverse.dto.user;
 
-import graber.thomas.feastverse.model.User;
+import graber.thomas.feastverse.model.user.User;
 import org.mapstruct.Mapper;
 
 /**

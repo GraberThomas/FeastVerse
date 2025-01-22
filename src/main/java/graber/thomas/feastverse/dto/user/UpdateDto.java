@@ -1,10 +1,8 @@
 package graber.thomas.feastverse.dto.user;
 
 import graber.thomas.feastverse.dto.auth.validation.ValidEmail;
-import graber.thomas.feastverse.model.UserType;
+import graber.thomas.feastverse.model.user.UserType;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
 
 import java.util.Set;
 

@@ -1,7 +1,7 @@
 package graber.thomas.feastverse.security;
 
-import graber.thomas.feastverse.model.User;
-import graber.thomas.feastverse.service.UserService;
+import graber.thomas.feastverse.model.user.User;
+import graber.thomas.feastverse.service.user.UserService;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.*;

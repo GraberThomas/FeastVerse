@@ -1,6 +1,6 @@
 package graber.thomas.feastverse.dto.user;
 
-import graber.thomas.feastverse.model.UserType;
+import graber.thomas.feastverse.model.user.UserType;
 
 import java.time.LocalDate;
 import java.util.Set;

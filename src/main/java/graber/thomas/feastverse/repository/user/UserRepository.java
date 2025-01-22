@@ -1,10 +1,9 @@
 package graber.thomas.feastverse.repository.user;
 
-import graber.thomas.feastverse.model.User;
+import graber.thomas.feastverse.model.user.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-import java.util.Optional;
 import java.util.UUID;
 
 /**

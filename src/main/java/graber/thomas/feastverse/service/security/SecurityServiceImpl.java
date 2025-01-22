@@ -1,4 +1,4 @@
-package graber.thomas.feastverse.service;
+package graber.thomas.feastverse.service.security;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;

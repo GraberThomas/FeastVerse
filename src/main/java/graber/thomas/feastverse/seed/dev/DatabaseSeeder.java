@@ -1,7 +1,7 @@
 package graber.thomas.feastverse.seed.dev;
 
-import graber.thomas.feastverse.model.User;
-import graber.thomas.feastverse.model.UserType;
+import graber.thomas.feastverse.model.user.User;
+import graber.thomas.feastverse.model.user.UserType;
 import graber.thomas.feastverse.repository.user.UserRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
