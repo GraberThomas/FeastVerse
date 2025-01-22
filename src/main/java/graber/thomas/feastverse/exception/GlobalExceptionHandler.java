@@ -8,10 +8,12 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * The GlobalExceptionHandler class provides centralized exception handling for the application.
@@ -35,9 +37,9 @@ public class GlobalExceptionHandler {
 
         response.put("timestamp", OffsetDateTime.now()); // Timestamp dans le format ISO-8601
         response.put("status", HttpStatus.BAD_REQUEST.value());
-        response.put("path", request.getDescription(false).replace("uri=", ""));
         response.put("errors", errors);
         response.put("message", "Validation failed");
+        response.put("path", request.getDescription(false).replace("uri=", ""));
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
@@ -51,8 +53,8 @@ public class GlobalExceptionHandler {
         response.put("timestamp", OffsetDateTime.now());
         response.put("status", HttpStatus.CONFLICT.value());
         response.put("error", HttpStatus.CONFLICT.getReasonPhrase());
-        response.put("path", request.getDescription(false).replace("uri=", ""));
         response.put("message", ex.getMessage());
+        response.put("path", request.getDescription(false).replace("uri=", ""));
 
         return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
     }
@@ -71,5 +73,42 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<Map<String, Object>> handleMethodArgumentTypeMismatch(
+            MethodArgumentTypeMismatchException ex, WebRequest request) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("timestamp", OffsetDateTime.now());
+        response.put("status", HttpStatus.BAD_REQUEST.value());
+        response.put("error", "Bad Request");
+
+        // Vérifie si l'erreur concerne un UUID
+        if (ex.getRequiredType() != null && ex.getRequiredType().equals(UUID.class)) {
+            response.put("message", "Invalid UUID format: " + ex.getValue());
+        } else {
+            // Message générique pour d'autres types de mismatch
+            response.put("message", "Invalid value for parameter '" + ex.getName() +
+                    "'. Expected type: " + (ex.getRequiredType() != null ? ex.getRequiredType().getSimpleName() : "unknown"));
+        }
+
+        response.put("path", request.getDescription(false).replace("uri=", ""));
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    }
+
+    @ExceptionHandler(SelfReportingException.class)
+    public ResponseEntity<Map<String, Object>> handleSelfReportingException(
+            SelfReportingException ex, WebRequest request
+            ){
+        Map<String, Object> response = new HashMap<>();
+        response.put("timestamp", OffsetDateTime.now());
+        response.put("status", HttpStatus.BAD_REQUEST.value());
+        response.put("error", "Bad Request");
+        response.put("message", ex.getMessage());
+        response.put("path", request.getDescription(false).replace("uri=", ""));
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    }
+
 
 }
