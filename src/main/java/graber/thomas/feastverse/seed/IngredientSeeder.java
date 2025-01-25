@@ -101,7 +101,7 @@ public class IngredientSeeder implements CommandLineRunner {
         IngredientType CHOCOLATES = ingredientTypeRepository.getIngredientTypeById(8L);
         IngredientType DRINKS = ingredientTypeRepository.getIngredientTypeById(9L);
 
-        List<Ingredient> vegetables_ingredients = parseCsv("chocolates_and_sweet_products.csv", VEGETABLES);
+        List<Ingredient> vegetables_ingredients = parseCsv("vegetables.csv", VEGETABLES);
         List<Ingredient> fruits_ingredients = parseCsv("fruits.csv", FRUITS);
         List<Ingredient> meat_ingredients = parseCsv("meats__poultry_and_delicatessen_products.csv", MEAT);
         List<Ingredient> fish_ingredients = parseCsv("fish_and_seafood.csv", FISH);
@@ -153,7 +153,7 @@ public class IngredientSeeder implements CommandLineRunner {
                 Ingredient ingredient = new Ingredient();
                 ingredient.setName(title);
                 ingredient.setDescription(description);
-                ingredient.setImage_url(imageUrl);
+                ingredient.setImage_file_name(imageUrl);
                 ingredient.setType(ingredientType);
                 ingredients.add(ingredient);
             }
