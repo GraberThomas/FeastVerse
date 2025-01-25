@@ -1,13 +1,11 @@
 package graber.thomas.feastverse.controller;
 
 import graber.thomas.feastverse.dto.reports.ReportCreateDto;
+import graber.thomas.feastverse.dto.reports.ReportUpdateDto;
 import graber.thomas.feastverse.dto.reports.ReportViewDTO;
 import graber.thomas.feastverse.dto.reports.ReportMapper;
-import graber.thomas.feastverse.dto.validation.UUIDValidator;
-import graber.thomas.feastverse.exception.SelfReportingException;
 import graber.thomas.feastverse.model.report.Report;
 import graber.thomas.feastverse.model.report.ReportType;
-import graber.thomas.feastverse.model.report.Reportable;
 import graber.thomas.feastverse.model.user.User;
 import graber.thomas.feastverse.service.report.ReportService;
 import graber.thomas.feastverse.service.security.SecurityService;
@@ -27,7 +25,6 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Tag(name = "Report", description = "Endpoints for reports")
@@ -82,38 +79,35 @@ public class ReportController {
         logger.info("Received request to create report with targetId: {} and type: {}",
                 reportCreateDto.targetId(), reportCreateDto.type());
 
-        UUID reporterId = securityService.getCurrentUserId();
-        UUID targetId = UUID.fromString(reportCreateDto.targetId());
-
-        if(targetId.equals(reporterId)){
-            throw new SelfReportingException("Users cannot report themselves.");
-        }
-
-        //TODO replace by reportable service call
-        Reportable target = userService.getById(targetId).orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.NOT_FOUND, "Target not found for ID: " + targetId));
-        User reporter = userService.getById(reporterId).orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.NOT_FOUND, "Reporter not found for ID: " + reporterId));
-
-        Optional<Report> newReport = reportService.create(reportCreateDto, reporter, target);
-
-        if(newReport.isEmpty()){
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to create report.");
-        }
+        Report newReport = reportService.create(reportCreateDto).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to create report.")
+        );
 
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
-                .buildAndExpand(newReport.get().getId())
+                .buildAndExpand(newReport.getId())
                 .toUri();
 
-        logger.info("Report created successfully with ID: {}. Returning HTTP 201 Created.", newReport.get().getId());
-
+        logger.info("Report created successfully with ID: {}. Returning HTTP 201 Created.", newReport.getId());
         return ResponseEntity.created(location).build();
     }
 
+    //TODO: Verify difference between user set null or value empty
+    @PreAuthorize("hasAnyRole('ROLE_MODERATOR', 'ROLE_ADMINISTRATOR')")
+    @PatchMapping("/{reportId}")
+    public ReportViewDTO updateReport(@Valid @RequestBody ReportUpdateDto reportUpdateDto, @PathVariable UUID reportId) {
+
+        Report updatedReport = reportService.update(reportId, reportUpdateDto).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to update report.")
+        );
+
+        return reportMapper.toReportView(updatedReport);
+
+    }
 
     @PreAuthorize("hasRole('ROLE_ADMINISTRATOR')")
+    @DeleteMapping("/{reportId}")
     public ResponseEntity<Void> deleteReport(@PathVariable UUID reportId) {
         reportService.delete(reportId);
         return ResponseEntity.noContent().build();

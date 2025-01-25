@@ -1,16 +1,24 @@
 package graber.thomas.feastverse.service.report;
 
 import graber.thomas.feastverse.dto.reports.ReportCreateDto;
+import graber.thomas.feastverse.dto.reports.ReportUpdateDto;
+import graber.thomas.feastverse.exception.SelfReportingException;
 import graber.thomas.feastverse.model.report.Report;
 import graber.thomas.feastverse.model.report.ReportType;
 import graber.thomas.feastverse.model.report.Reportable;
 import graber.thomas.feastverse.model.user.User;
 import graber.thomas.feastverse.repository.report.ReportRepository;
 import graber.thomas.feastverse.repository.report.ReportSpecifications;
+import graber.thomas.feastverse.service.security.SecurityService;
+import graber.thomas.feastverse.service.user.UserService;
 import org.springframework.data.domain.Page;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -21,9 +29,15 @@ import java.util.UUID;
 public class ReportServiceImpl implements ReportService {
 
     private final ReportRepository reportRepository;
+    private final SecurityService securityService;
+    private final UserService userService;
 
-    public ReportServiceImpl(ReportRepository reportRepository) {
+    private static final Logger logger = LoggerFactory.getLogger(ReportServiceImpl.class);
+
+    public ReportServiceImpl(ReportRepository reportRepository, SecurityService securityService, UserService userService) {
         this.reportRepository = reportRepository;
+        this.securityService = securityService;
+        this.userService = userService;
     }
 
     @Override
@@ -37,20 +51,92 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public Optional<Report> create(ReportCreateDto reportCreateDto, User reporter ,Reportable reportableTarget) {
+    public Optional<Report> create(ReportCreateDto dto) {
+        // Récupération de l’ID de l’utilisateur courant via le contexte de sécurité
+        UUID reporterId = securityService.getCurrentUserId();
+        UUID targetId = UUID.fromString(dto.targetId());
+
+        // Logique métier : on ne peut pas se signaler soi-même
+        if (targetId.equals(reporterId)) {
+            throw new SelfReportingException("Users cannot report themselves.");
+        }
+
+        // Récupération des entités
+        User reporter = userService.getById(reporterId).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Reporter not found for ID: " + reporterId));
+
+        //TODO: replace with ReportableService
+        Reportable target = userService.getById(targetId).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Target not found for ID: " + targetId));
+
+        // Création de l’entité Report
         Report report = new Report();
-        report.setTarget(reportableTarget);
+        report.setTarget(target);
         report.setReporter(reporter);
-        report.setType(reportCreateDto.type());
+        report.setType(dto.type());
         report.setCreatedDate(LocalDate.now());
         report.setResolved(false);
-        report.setMessage(reportCreateDto.message());
+        report.setMessage(dto.message());
+
         return Optional.of(reportRepository.save(report));
     }
 
     @Override
-    public Optional<Report> update(UUID id, Report report) {
-        return Optional.empty();
+    public Optional<Report> update(UUID reportId, ReportUpdateDto reportUpdateDto) {
+        logger.info("Updating report with ID: {}. Update details: message={}, messageProvided={}, type={}, reporterId={}, targetId={}, resolved={}",
+                reportId,
+                reportUpdateDto.getMessage(),
+                reportUpdateDto.isMessageProvided(),
+                reportUpdateDto.getType(),
+                reportUpdateDto.getReporterId(),
+                reportUpdateDto.getTargetId(),
+                reportUpdateDto.getResolved()
+        );
+
+        if(securityService.hasRole("ROLE_MODERATOR")) {
+            if(
+                    reportUpdateDto.isTargetIdProvided() ||
+                    reportUpdateDto.isReporterIdProvided() ||
+                    reportUpdateDto.isTypeProvided() ||
+                    reportUpdateDto.isMessageProvided()
+            ){
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Moderator can only modify resolved status.");
+            }
+        }
+
+        Report report = reportRepository.findById(reportId).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Report not found for ID: " + reportId)
+        );
+
+        if (reportUpdateDto.getResolved() != null) {
+            report.setResolved(reportUpdateDto.getResolved());
+        }
+
+        if (reportUpdateDto.isMessageProvided()) {
+            report.setMessage(reportUpdateDto.getMessage());
+        }
+
+        if (reportUpdateDto.isTypeProvided()) {
+            report.setType(reportUpdateDto.getType());
+        }
+
+        if (reportUpdateDto.isReporterIdProvided()) {
+            User reporter = userService.getById(reportUpdateDto.getReporterId()).orElseThrow(
+                    () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Reporter not found for ID: " + reportUpdateDto.getReporterId())
+            );
+            report.setReporter(reporter);
+        }
+
+        if (reportUpdateDto.isTargetIdProvided()) {
+            User target = userService.getById(reportUpdateDto.getTargetId()).orElseThrow(
+                    () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Target not found for ID: " + reportUpdateDto.getTargetId())
+            );
+            report.setTarget(target);
+        }
+
+        report.setUpdatedDate(LocalDate.now());
+
+        return Optional.of(reportRepository.save(report));
     }
 
     @Override
