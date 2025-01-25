@@ -28,6 +28,15 @@ public class IngredientType {
 
     private String image_file_name;
 
+    public IngredientType() {}
+
+    public IngredientType(Long id, String name, String description, String imageFileName) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.image_file_name = imageFileName;
+    }
+
     @Transient
     public String getImage_url() {
         return "/images/ingredient_type/" + image_file_name;

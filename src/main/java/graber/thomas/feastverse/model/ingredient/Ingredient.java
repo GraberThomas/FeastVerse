@@ -1,9 +1,7 @@
 package graber.thomas.feastverse.model.ingredient;
 
 import jakarta.persistence.*;
-import org.hibernate.annotations.ColumnDefault;
-
-import java.util.UUID;
+import org.hibernate.validator.constraints.Length;
 
 @Entity
 @Table(name = "ingredients")
@@ -20,7 +18,19 @@ public class Ingredient {
     @JoinColumn(name = "type_id", nullable = false) // La colonne dans la table "ingredients"
     private IngredientType type;
 
+    @Length(max = 3000)
+    private String description;
+
     private String image_url;
+
+    public Ingredient() {}
+
+    public Ingredient(String name, IngredientType type, String image_url, String description) {
+        this.name = name;
+        this.type = type;
+        this.image_url = image_url;
+        this.description = description;
+    }
 
     public Long getId() {
         return id;
@@ -52,5 +62,13 @@ public class Ingredient {
 
     public void setImage_url(String image_url) {
         this.image_url = image_url;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }
