@@ -35,9 +35,10 @@ public class IngredientServiceImpl implements IngredientService{
     }
 
     @Override
-    public Page<Ingredient> getAllIngredients(String name, Long IngredientTypeId, Pageable pageable) {
+    public Page<Ingredient> getAllIngredients(String name, Long ingredientTypeId, String ingredientTypeName, Pageable pageable) {
         Specification<Ingredient> spec = IngredientSpecifications.hasName(name);
-        spec = spec.and(IngredientSpecifications.hasIngredientType(IngredientTypeId));
+        spec = spec.and(IngredientSpecifications.hasIngredientType(ingredientTypeId));
+        spec = spec.and(IngredientSpecifications.hasIngredientTypeName(ingredientTypeName));
         return this.ingredientRepository.findAll(spec, pageable);
     }
 }

@@ -23,4 +23,18 @@ public class IngredientSpecifications {
             return criteriaBuilder.equal(root.get("type").get("id"), ingredientTypeId);
         };
     }
+
+    public static Specification<Ingredient> hasIngredientTypeName(String typeName) {
+        return (root, query, criteriaBuilder) -> {
+            if (typeName == null || typeName.isEmpty()) {
+                return null;
+            }
+
+            return criteriaBuilder.like(
+                    criteriaBuilder.lower(root.get("type").get("name")),
+                    "%" + typeName.toLowerCase() + "%"
+            );
+        };
+    }
+
 }

@@ -12,5 +12,5 @@ public interface IngredientService {
 
     Optional<IngredientType> getById(Long id);
 
-    public Page<Ingredient> getAllIngredients(String name, Long IngredientTypeId, Pageable pageable);
+    public Page<Ingredient> getAllIngredients(String name, Long ingredientTypeId, String ingredientTypeName, Pageable pageable);
 }

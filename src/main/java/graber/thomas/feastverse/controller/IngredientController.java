@@ -39,9 +39,13 @@ public class IngredientController {
     @GetMapping
     public Page<IngredientViewDto> getAllIngredients(
             @RequestParam(required = false) String name,
-            @RequestParam(required = false) Long type,
+            @RequestParam(required = false) String typeName,
+            @RequestParam(required = false) Long typeId,
             Pageable pageable
     ) {
-        return ingredientService.getAllIngredients(name, type, pageable).map(IngredientViewDto::fromEntity);
+        if(typeId != null && typeName != null){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You cannot filter by both typeId and typeName");
+        }
+        return ingredientService.getAllIngredients(name, typeId, typeName, pageable).map(IngredientViewDto::fromEntity);
     }
 }
