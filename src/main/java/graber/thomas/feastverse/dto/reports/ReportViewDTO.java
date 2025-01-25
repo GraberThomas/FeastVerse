@@ -10,5 +10,6 @@ public record ReportViewDTO(
         ReportType type,
         UUID reporterId,
         UUID targetId,
+        Boolean resolved,
         String targetType
 ) {}
