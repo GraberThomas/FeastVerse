@@ -26,7 +26,7 @@ public class Report {
     private Reportable target;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "created_by")
+    @JoinColumn(name = "created_by", nullable = false)
     private User reporter;
 
     @Column(nullable = false)
