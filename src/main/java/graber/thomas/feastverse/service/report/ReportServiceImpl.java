@@ -3,6 +3,7 @@ package graber.thomas.feastverse.service.report;
 import graber.thomas.feastverse.dto.reports.ReportCreateDto;
 import graber.thomas.feastverse.dto.reports.ReportUpdateDto;
 import graber.thomas.feastverse.exception.ForbiddenActionException;
+import graber.thomas.feastverse.exception.InvalidNullProperty;
 import graber.thomas.feastverse.exception.SelfReportingException;
 import graber.thomas.feastverse.model.report.Report;
 import graber.thomas.feastverse.model.report.ReportType;
@@ -104,7 +105,10 @@ public class ReportServiceImpl implements ReportService {
                 () -> new EntityNotFoundException("Report not found for ID: " + reportId)
         );
 
-        if (reportUpdateDto.getResolved() != null) {
+        if (reportUpdateDto.isResolvedProvided()) {
+            if(reportUpdateDto.getResolved() == null){
+                throw new InvalidNullProperty("resolved");
+            }
             report.setResolved(reportUpdateDto.getResolved());
         }
 
