@@ -18,18 +18,23 @@ public class Ingredient {
     @JoinColumn(name = "type_id", nullable = false) // La colonne dans la table "ingredients"
     private IngredientType type;
 
-    @Length(max = 3000)
+    @Length(max = 5000)
     private String description;
 
-    private String image_url;
+    private String image_file_name;
 
     public Ingredient() {}
 
-    public Ingredient(String name, IngredientType type, String image_url, String description) {
+    public Ingredient(String name, IngredientType type, String image_file_name, String description) {
         this.name = name;
         this.type = type;
-        this.image_url = image_url;
+        this.image_file_name = image_file_name;
         this.description = description;
+    }
+
+    @Transient
+    public String getImage_url() {
+        return "/images/ingredient/" + image_file_name;
     }
 
     public Long getId() {
@@ -56,12 +61,12 @@ public class Ingredient {
         this.type = type;
     }
 
-    public String getImage_url() {
-        return image_url;
+    public String getImage_file_name() {
+        return image_file_name;
     }
 
-    public void setImage_url(String image_url) {
-        this.image_url = image_url;
+    public void setImage_file_name(String image_url) {
+        this.image_file_name = image_url;
     }
 
     public String getDescription() {
