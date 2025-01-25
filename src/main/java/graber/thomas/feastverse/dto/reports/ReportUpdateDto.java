@@ -22,10 +22,12 @@ public class ReportUpdateDto{
 
         private Boolean resolved;
 
-        private boolean isMessageProvided;
-        private boolean isTypeProvided;
-        private boolean isReporterIdProvided;
-        private boolean isTargetIdProvided;
+        private boolean isMessageProvided = false;
+        private boolean isTypeProvided = false;
+        private boolean isReporterIdProvided = false;
+        private boolean isTargetIdProvided = false;
+
+        private boolean isResolvedProvided = false;
 
         public ReportUpdateDto(){}
 
@@ -70,6 +72,7 @@ public class ReportUpdateDto{
         }
 
         public void setResolved(Boolean resolved) {
+                this.isResolvedProvided = true;
                 this.resolved = resolved;
         }
 
@@ -87,6 +90,10 @@ public class ReportUpdateDto{
 
         public boolean isTargetIdProvided() {
                 return isTargetIdProvided;
+        }
+
+        public boolean isResolvedProvided() {
+                return isResolvedProvided;
         }
 }
 
