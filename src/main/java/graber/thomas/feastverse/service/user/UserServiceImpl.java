@@ -1,5 +1,6 @@
 package graber.thomas.feastverse.service.user;
 import graber.thomas.feastverse.dto.user.UpdateDto;
+import graber.thomas.feastverse.exception.ForbiddenActionException;
 import graber.thomas.feastverse.model.user.User;
 import graber.thomas.feastverse.model.user.UserType;
 import graber.thomas.feastverse.repository.user.UserRepository;
@@ -45,11 +46,11 @@ public class UserServiceImpl implements UserService {
                                   String pseudo,
                                   String email,
                                   Pageable pageable
-    ) throws AccessDeniedException, IllegalArgumentException {
+    ) throws ForbiddenActionException, IllegalArgumentException {
         boolean hasFilter = hasFilter(role, lastName, firstName, pseudo, email);
 
         if (hasFilter && !securityService.hasRole("ROLE_ADMINISTRATOR")) {
-            throw new AccessDeniedException("Only administrators can use filters on users.");
+            throw new ForbiddenActionException("Only administrators can use filters on users.");
         }
 
         if (hasFilter) {
