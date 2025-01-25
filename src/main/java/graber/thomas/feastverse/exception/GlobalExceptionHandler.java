@@ -1,5 +1,6 @@
 package graber.thomas.feastverse.exception;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -108,6 +109,34 @@ public class GlobalExceptionHandler {
         response.put("path", request.getDescription(false).replace("uri=", ""));
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    }
+
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleEntityNotFoundException(
+            EntityNotFoundException ex, WebRequest request
+    ){
+        Map<String, Object> response = new HashMap<>();
+        response.put("timestamp", OffsetDateTime.now());
+        response.put("status", HttpStatus.NOT_FOUND.value());
+        response.put("error", HttpStatus.NOT_FOUND.getReasonPhrase());
+        response.put("message", ex.getMessage());
+        response.put("path", request.getDescription(false).replace("uri=", ""));
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+    }
+
+    @ExceptionHandler(ForbiddenActionException.class)
+    public ResponseEntity<Map<String, Object>> handleForbiddenActionException(
+            ForbiddenActionException ex, WebRequest request
+    ){
+        Map<String, Object> response = new HashMap<>();
+        response.put("timestamp", OffsetDateTime.now());
+        response.put("status", HttpStatus.FORBIDDEN.value());
+        response.put("error", HttpStatus.FORBIDDEN.getReasonPhrase());
+        response.put("message", ex.getMessage());
+        response.put("path", request.getDescription(false).replace("uri=", ""));
+
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
     }
 
 

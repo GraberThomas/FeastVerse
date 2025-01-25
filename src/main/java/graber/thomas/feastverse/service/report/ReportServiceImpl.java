@@ -2,6 +2,7 @@ package graber.thomas.feastverse.service.report;
 
 import graber.thomas.feastverse.dto.reports.ReportCreateDto;
 import graber.thomas.feastverse.dto.reports.ReportUpdateDto;
+import graber.thomas.feastverse.exception.ForbiddenActionException;
 import graber.thomas.feastverse.exception.SelfReportingException;
 import graber.thomas.feastverse.model.report.Report;
 import graber.thomas.feastverse.model.report.ReportType;
@@ -11,6 +12,7 @@ import graber.thomas.feastverse.repository.report.ReportRepository;
 import graber.thomas.feastverse.repository.report.ReportSpecifications;
 import graber.thomas.feastverse.service.security.SecurityService;
 import graber.thomas.feastverse.service.user.UserService;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.Page;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,24 +54,20 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     public Optional<Report> create(ReportCreateDto dto) {
-        // Récupération de l’ID de l’utilisateur courant via le contexte de sécurité
         UUID reporterId = securityService.getCurrentUserId();
-        UUID targetId = UUID.fromString(dto.targetId());
 
-        // Logique métier : on ne peut pas se signaler soi-même
-        if (targetId.equals(reporterId)) {
+        if (dto.targetId().equals(reporterId)) {
             throw new SelfReportingException("Users cannot report themselves.");
         }
 
-        // Récupération des entités
         User reporter = userService.getById(reporterId).orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.NOT_FOUND, "Reporter not found for ID: " + reporterId));
+                new EntityNotFoundException("Reporter not found for ID: " + reporterId)
+        );
 
-        //TODO: replace with ReportableService
-        Reportable target = userService.getById(targetId).orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.NOT_FOUND, "Target not found for ID: " + targetId));
-
-        // Création de l’entité Report
+        Reportable target = userService.getById(dto.targetId()).orElseThrow(() ->
+                new EntityNotFoundException("Target not found for ID: " + dto.targetId())
+        );
+        
         Report report = new Report();
         report.setTarget(target);
         report.setReporter(reporter);
@@ -100,12 +98,12 @@ public class ReportServiceImpl implements ReportService {
                     reportUpdateDto.isTypeProvided() ||
                     reportUpdateDto.isMessageProvided()
             ){
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Moderator can only modify resolved status.");
+                throw new ForbiddenActionException("Moderator can only modify resolved status.");
             }
         }
 
         Report report = reportRepository.findById(reportId).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Report not found for ID: " + reportId)
+                () -> new EntityNotFoundException("Report not found for ID: " + reportId)
         );
 
         if (reportUpdateDto.getResolved() != null) {
@@ -122,14 +120,14 @@ public class ReportServiceImpl implements ReportService {
 
         if (reportUpdateDto.isReporterIdProvided()) {
             User reporter = userService.getById(reportUpdateDto.getReporterId()).orElseThrow(
-                    () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Reporter not found for ID: " + reportUpdateDto.getReporterId())
+                    () -> new EntityNotFoundException("Reporter not found for ID: " + reportUpdateDto.getReporterId())
             );
             report.setReporter(reporter);
         }
 
         if (reportUpdateDto.isTargetIdProvided()) {
             User target = userService.getById(reportUpdateDto.getTargetId()).orElseThrow(
-                    () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Target not found for ID: " + reportUpdateDto.getTargetId())
+                    () -> new EntityNotFoundException("Target not found for ID: " + reportUpdateDto.getTargetId())
             );
             report.setTarget(target);
         }

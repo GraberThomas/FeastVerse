@@ -93,7 +93,6 @@ public class ReportController {
         return ResponseEntity.created(location).build();
     }
 
-    //TODO: Verify difference between user set null or value empty
     @PreAuthorize("hasAnyRole('ROLE_MODERATOR', 'ROLE_ADMINISTRATOR')")
     @PatchMapping("/{reportId}")
     public ReportViewDTO updateReport(@Valid @RequestBody ReportUpdateDto reportUpdateDto, @PathVariable UUID reportId) {
