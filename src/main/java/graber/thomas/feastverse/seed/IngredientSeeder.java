@@ -1,6 +1,5 @@
 package graber.thomas.feastverse.seed;
 
-import graber.thomas.feastverse.controller.ReportController;
 import graber.thomas.feastverse.model.ingredient.Ingredient;
 import graber.thomas.feastverse.model.ingredient.IngredientType;
 import graber.thomas.feastverse.repository.ingredients.IngredientRepository;
@@ -21,8 +20,8 @@ import java.util.List;
 
 @Component
 public class IngredientSeeder implements CommandLineRunner {
-    private IngredientRepository ingredientRepository;
-    private IngredientTypeRepository ingredientTypeRepository;
+    private final IngredientRepository ingredientRepository;
+    private final IngredientTypeRepository ingredientTypeRepository;
     private static final Logger logger = LoggerFactory.getLogger(IngredientSeeder.class);
 
     public IngredientSeeder(IngredientRepository ingredientRepository, IngredientTypeRepository ingredientTypeRepository) {
