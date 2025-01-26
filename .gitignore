@@ -5,7 +5,7 @@ build/
 !**/src/test/**/build/
 
 .env
-*.env
+*.env*
 
 ### IntelliJ IDEA ###
 .idea/modules.xml
