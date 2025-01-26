@@ -79,9 +79,6 @@ public class IngredientServiceImpl implements IngredientService{
             } catch (IOException e) {
                 throw new RuntimeException("Failed to upload file", e);
             }
-        } else {
-            // Si aucun fichier n'est fourni, utilisez une image par défaut
-            fileUrl = "default_ingredient_image.png";
         }
 
         // Create the ingredient entity

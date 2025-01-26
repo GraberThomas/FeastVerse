@@ -19,7 +19,15 @@ public class IngredientMapper {
                 entity.getName(),
                 IngredientTypeViewDto.fromEntityMinimal(entity.getType()),
                 entity.getDescription(),
-                imageUrlResolver.resolveUrl(entity.getImage_file_name(), entity.getImage_file_name())
+                entity.getImage_file_name() != null ?
+                    imageUrlResolver.resolveUrl(
+                            entity.getOwner() == null,
+                            "ingredient",
+                            entity.getImage_file_name(),
+                            entity.getImage_file_name()
+                    )
+                :
+                null
         );
     }
 }

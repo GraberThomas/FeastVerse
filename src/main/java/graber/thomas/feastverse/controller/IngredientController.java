@@ -70,7 +70,7 @@ public class IngredientController {
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public IngredientViewDto createIngredient(
             @Valid @RequestPart("ingredient") IngredientCreateDto ingredientDto,
-            @RequestPart("file") MultipartFile file
+            @RequestPart(value = "file", required = false) MultipartFile file
     ) {
         return ingredientMapper.toViewDto(
                 ingredientService.createIngredient(ingredientDto, file).orElseThrow(
