@@ -9,10 +9,14 @@ import graber.thomas.feastverse.utils.OwnershipFilter;
 import graber.thomas.feastverse.utils.VisibilityFilter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
@@ -26,6 +30,7 @@ public class IngredientController {
     private final IngredientService ingredientService;
     private final IngredientMapper ingredientMapper;
     private final SecurityService securityService;
+    private static final Logger logger = LoggerFactory.getLogger(IngredientController.class);
 
     public IngredientController(IngredientService ingredientService, SecurityService securityService, IngredientMapper ingredientMapper) {
         this.ingredientService = ingredientService;
@@ -83,6 +88,7 @@ public class IngredientController {
         return ingredientMapper.toPublicViewDto(ingredient);
     }
 
+    @PreAuthorize("hasRole('ROLE_STANDARD')")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public IngredientViewDto createIngredient(
             @Valid @RequestPart("ingredient") IngredientCreateDto ingredientDto,
@@ -96,4 +102,37 @@ public class IngredientController {
         }
         return ingredientMapper.toPublicViewDto(ingredient);
     }
+
+    @PreAuthorize("isAuthenticated()")
+    @PatchMapping(value = "/{ingredientId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public IngredientViewDto patchIngredient(
+            @PathVariable Long ingredientId,
+            @Valid @RequestPart("ingredient") IngredientPatchDto ingredientPatchDto,
+            @RequestPart(value = "file", required = false) MultipartFile file
+    ){
+        Ingredient ingredient = ingredientService.getIngredientById(ingredientId).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ingredient not found for id " + ingredientId + ".")
+        );
+        Ingredient patchedIngredient = ingredientService.patchIngredient(ingredient, ingredientPatchDto, file);
+
+        IngredientViewDto dto = ingredientMapper.toPublicViewDto(patchedIngredient);
+        if (dto == null) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Mapping to DTO returned null.");
+        }
+        return dto;
+    }
+
+    @DeleteMapping("/{ingredientId}")
+    public ResponseEntity<Void> deleteIngredient(
+            @PathVariable Long ingredientId,
+            @RequestParam(required = false, defaultValue = "false") Boolean hardDelete
+    ) {
+        if(!securityService.hasRole("ROLE_ADMINISTRATOR") && hardDelete){
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only administrator can perform hard delete.");
+        }
+
+        this.ingredientService.deleteIngredient(ingredientId, hardDelete);
+        return ResponseEntity.noContent().build();
+    }
+
 }

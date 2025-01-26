@@ -17,13 +17,15 @@ public abstract class IngredientMapper {
     @Autowired
     protected ImageUrlResolver imageUrlResolver;
 
-    @Mapping(target = "isPublic", source = "public")
-    @Mapping(target = "isDeleted", source = "deleted")
+    @Mapping(target = "isPublic", source = "isPublic")
+    @Mapping(target = "isDeleted", source = "isDeleted")
     @Mapping(target = "ownerId", source = "owner", qualifiedByName = "mapOwnerId")
     @Mapping(target = "type", source = "type", qualifiedByName = "mapIngredientType")
     @Mapping(target = "imageUrl", source = ".", qualifiedByName = "resolveImageUrl")
     public abstract IngredientAdminViewDto toAdminViewDto(Ingredient ingredient);
 
+    @Mapping(target = "isPublic", source = "isPublic")
+    @Mapping(target = "ownerId", source = "owner", qualifiedByName = "mapOwnerId")
     @Mapping(target = "type", source = "type", qualifiedByName = "mapIngredientType")
     @Mapping(target = "imageUrl", source = ".", qualifiedByName = "resolveImageUrl")
     public abstract IngredientPublicViewDto toPublicViewDto(Ingredient ingredient);

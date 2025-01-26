@@ -22,19 +22,20 @@ public abstract class OwnableEntity {
         this.owner = owner;
     }
 
-    public boolean isPublic() {
-        return isPublic;
-    }
-
     public void setPublic(boolean aPublic) {
         isPublic = aPublic;
-    }
-
-    public boolean isDeleted() {
-        return isDeleted;
     }
 
     public void setDeleted(boolean deleted) {
         isDeleted = deleted;
     }
+
+    public boolean getIsPublic() {
+        return isPublic;
+    }
+
+    public boolean getIsDeleted() {
+        return isDeleted;
+    }
+
 }

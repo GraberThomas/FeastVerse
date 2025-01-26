@@ -1,6 +1,7 @@
 package graber.thomas.feastverse.service.ingredient;
 
 import graber.thomas.feastverse.dto.ingredient.IngredientCreateDto;
+import graber.thomas.feastverse.dto.ingredient.IngredientPatchDto;
 import graber.thomas.feastverse.model.ingredient.Ingredient;
 import graber.thomas.feastverse.model.ingredient.IngredientType;
 import graber.thomas.feastverse.utils.DeletedFilter;
@@ -32,4 +33,8 @@ public interface IngredientService {
     Optional<Ingredient> getIngredientById(Long id);
 
     Optional<Ingredient> createIngredient(IngredientCreateDto ingredientCreateDto, MultipartFile file);
+
+    Ingredient patchIngredient(Ingredient ingredient, IngredientPatchDto ingredientPatchDto, MultipartFile file);
+
+    void deleteIngredient(Long id, Boolean hardDelete);
 }
