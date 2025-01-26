@@ -276,62 +276,72 @@ public class DatabaseSeeder implements CommandLineRunner {
             ingredient1.setOwner(user1);
             ingredient1.setPublic(true);
             ingredient1.setDeleted(false);
+            ingredient1.setCreatedDate(LocalDate.of(2023,10,10));
             ingredientRepository.save(ingredient1);
 
             Ingredient ingredient2 = new Ingredient("Tomato blue", VEGETABLES, null, "Ripe and juicy tomato");
             ingredient2.setOwner(user2);
             ingredient2.setPublic(false);
             ingredient2.setDeleted(false);
+            ingredient2.setCreatedDate(LocalDate.of(2024,2,14));
+            ingredient2.setUpdatedDate(LocalDate.now());
             ingredientRepository.save(ingredient2);
 
             Ingredient ingredient3 = new Ingredient("Banana meat", FRUITS, null, "Sweet and healthy banana");
             ingredient3.setOwner(user3);
             ingredient3.setPublic(true);
             ingredient3.setDeleted(false);
+            ingredient3.setCreatedDate(LocalDate.of(2024,2,14));
             ingredientRepository.save(ingredient3);
 
             Ingredient ingredient4 = new Ingredient("Chicken Breast", MEAT, null, "Lean and protein-packed chicken");
             ingredient4.setOwner(user4);
             ingredient4.setPublic(false);
             ingredient4.setDeleted(false);
+            ingredient4.setCreatedDate(LocalDate.of(2024,2,14));
             ingredientRepository.save(ingredient4);
 
             Ingredient ingredient5 = new Ingredient("Salmon Fillet", FISH, null, "Fresh Atlantic salmon");
             ingredient5.setOwner(user5);
             ingredient5.setPublic(true);
             ingredient5.setDeleted(false);
+            ingredient5.setCreatedDate(LocalDate.of(2024,2,14));
             ingredientRepository.save(ingredient5);
 
             Ingredient ingredient6 = new Ingredient("Eggs Rooten", EGGS, null, "Organic free-range eggs");
             ingredient6.setOwner(user6);
             ingredient6.setPublic(false);
             ingredient6.setDeleted(false);
+            ingredient6.setCreatedDate(LocalDate.of(2024,2,14));
             ingredientRepository.save(ingredient6);
 
             Ingredient ingredient7 = new Ingredient("Penne Pasta", PASTA, null, "Italian-style penne pasta");
             ingredient7.setOwner(user7);
             ingredient7.setPublic(true);
             ingredient7.setDeleted(false);
+            ingredient7.setCreatedDate(LocalDate.of(2024,2,14));
             ingredientRepository.save(ingredient7);
 
             Ingredient ingredient8 = new Ingredient("Black Pepper", SPICES, null, "Finely ground black pepper");
             ingredient8.setOwner(user8);
             ingredient8.setPublic(true);
-            ingredient8.setDeleted(true); // Marqué comme supprimé
+            ingredient8.setDeleted(true);
+            ingredient8.setCreatedDate(LocalDate.of(2024,2,14));
             ingredientRepository.save(ingredient8);
 
             Ingredient ingredient9 = new Ingredient("Dark Chocolate", CHOCOLATES, null, "70% cocoa dark chocolate");
             ingredient9.setOwner(user7);
             ingredient9.setPublic(false);
             ingredient9.setDeleted(false);
+            ingredient9.setCreatedDate(LocalDate.of(2024,2,14));
             ingredientRepository.save(ingredient9);
 
             Ingredient ingredient10 = new Ingredient("Orange Juice", DRINKS, null, "Freshly squeezed orange juice");
             ingredient10.setOwner(user3);
             ingredient10.setPublic(true);
             ingredient10.setDeleted(false);
+            ingredient10.setCreatedDate(LocalDate.of(2024,2,14));
             ingredientRepository.save(ingredient10);
-
         }
     }
 }
