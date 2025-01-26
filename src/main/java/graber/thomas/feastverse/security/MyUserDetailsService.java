@@ -36,11 +36,13 @@ public class MyUserDetailsService implements UserDetailsService {
      * Nouvelle méthode pour charger l’utilisateur par son UUID.
      */
     public UserDetails loadUserById(UUID id) throws UsernameNotFoundException {
-        User user = userService.getById(id)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found by id: " + id));
-
-        return buildUserDetails(user);
+        return userService.getById(id)
+                .map(this::buildUserDetails)
+                .orElseThrow(() -> {
+                    return new UsernameNotFoundException("Authenticated user don't exist");
+                });
     }
+
 
     /**
      * Factorise la construction de l’objet UserDetails.
