@@ -31,7 +31,7 @@ public class IngredientController {
 
     @GetMapping("/types/{typeId}")
     public IngredientTypeViewDto getById(@PathVariable Long typeId) {
-        return IngredientTypeViewDto.fromEntity(ingredientService.getById(typeId).orElseThrow(
+        return IngredientTypeViewDto.fromEntity(ingredientService.getIngredientTypeById(typeId).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ingredient type not found for id " + typeId + ".")
         ));
     }
@@ -50,7 +50,9 @@ public class IngredientController {
     }
 
     @GetMapping("/{ingredientId}")
-    public IngredientViewDto getIngredient(@RequestParam Long ingredientId) {
-
+    public IngredientViewDto getIngredient(@PathVariable Long ingredientId) {
+        return IngredientViewDto.fromEntity(ingredientService.getIngredientById(ingredientId).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND)
+        ));
     }
 }

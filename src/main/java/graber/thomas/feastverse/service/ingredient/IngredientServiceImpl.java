@@ -30,7 +30,7 @@ public class IngredientServiceImpl implements IngredientService{
     }
 
     @Override
-    public Optional<IngredientType> getById(Long id) {
+    public Optional<IngredientType> getIngredientTypeById(Long id) {
         return ingredientTypeRepository.findById(id);
     }
 
@@ -40,5 +40,10 @@ public class IngredientServiceImpl implements IngredientService{
         spec = spec.and(IngredientSpecifications.hasIngredientType(ingredientTypeId));
         spec = spec.and(IngredientSpecifications.hasIngredientTypeName(ingredientTypeName));
         return this.ingredientRepository.findAll(spec, pageable);
+    }
+
+    @Override
+    public Optional<Ingredient> getIngredientById(Long id) {
+        return this.ingredientRepository.findById(id);
     }
 }

@@ -10,7 +10,9 @@ import java.util.Optional;
 public interface IngredientService {
     Page<IngredientType> getAllTypes(String name, Pageable pageable);
 
-    Optional<IngredientType> getById(Long id);
+    Optional<IngredientType> getIngredientTypeById(Long id);
 
-    public Page<Ingredient> getAllIngredients(String name, Long ingredientTypeId, String ingredientTypeName, Pageable pageable);
+    Page<Ingredient> getAllIngredients(String name, Long ingredientTypeId, String ingredientTypeName, Pageable pageable);
+
+    Optional<Ingredient> getIngredientById(Long id);
 }
