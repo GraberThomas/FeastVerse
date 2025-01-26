@@ -12,9 +12,11 @@ import graber.thomas.feastverse.repository.ingredients.IngredientTypeSpecificati
 import graber.thomas.feastverse.service.FileUploadService;
 import graber.thomas.feastverse.service.security.SecurityService;
 import graber.thomas.feastverse.service.user.UserService;
+import graber.thomas.feastverse.utils.DeletedFilter;
 import graber.thomas.feastverse.utils.OwnershipFilter;
 import graber.thomas.feastverse.utils.VisibilityFilter;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.dao.PermissionDeniedDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -60,12 +62,18 @@ public class IngredientServiceImpl implements IngredientService{
             String ingredientTypeName,
             VisibilityFilter visibilityFilter,
             OwnershipFilter ownershipFilter,
+            DeletedFilter deletedStatus,
             UUID ownerId,
             Pageable pageable
     ){
         if(visibilityFilter != VisibilityFilter.PUBLIC){
             if(!securityService.hasRole("ROLE_ADMINISTRATOR")){
                 throw new ForbiddenActionException("Only administrator can get hidden ingredients");
+            }
+        }
+        if(deletedStatus != DeletedFilter.NOT_DELETED){
+            if(!securityService.hasRole("ROLE_ADMINISTRATOR")){
+                throw new ForbiddenActionException("Only administrator can get filter by deleted status");
             }
         }
 
@@ -87,11 +95,31 @@ public class IngredientServiceImpl implements IngredientService{
         }else if(ownershipFilter == OwnershipFilter.DEFAULT){
             spec=spec.and(IngredientSpecifications.isDefault());
         }
+        if(deletedStatus == DeletedFilter.NOT_DELETED) {
+            spec=spec.and(IngredientSpecifications.isNotDeleted());
+        }else if(deletedStatus == DeletedFilter.DELETED){
+            spec=spec.and(IngredientSpecifications.isDeleted());
+        }
         return this.ingredientRepository.findAll(spec, pageable);
     }
 
     @Override
     public Optional<Ingredient> getIngredientById(Long id) {
+        UUID userId = securityService.getCurrentUserId();
+        Optional<Ingredient> ingredient = this.ingredientRepository.findById(id);
+
+        if(ingredient.isPresent()){
+            Ingredient ing = ingredient.get();
+
+            if(ing.isDeleted()){
+                throw new EntityNotFoundException("Ingredient not found for ID: " + id);
+            }
+
+            if(!ing.getOwner().getId().equals(userId)){
+                throw new ForbiddenActionException("You are not allowed to access this ingredient.");
+            }
+        }
+
         return this.ingredientRepository.findById(id);
     }
 

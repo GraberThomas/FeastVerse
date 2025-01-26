@@ -3,6 +3,7 @@ package graber.thomas.feastverse.service.ingredient;
 import graber.thomas.feastverse.dto.ingredient.IngredientCreateDto;
 import graber.thomas.feastverse.model.ingredient.Ingredient;
 import graber.thomas.feastverse.model.ingredient.IngredientType;
+import graber.thomas.feastverse.utils.DeletedFilter;
 import graber.thomas.feastverse.utils.OwnershipFilter;
 import graber.thomas.feastverse.utils.VisibilityFilter;
 import org.springframework.data.domain.Page;
@@ -23,6 +24,7 @@ public interface IngredientService {
             String ingredientTypeName,
             VisibilityFilter visibilityFilter,
             OwnershipFilter ownershipFilter,
+            DeletedFilter deletedStatus,
             UUID ownerId,
             Pageable pageable
     );

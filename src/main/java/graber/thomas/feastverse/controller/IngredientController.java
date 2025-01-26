@@ -4,6 +4,7 @@ import graber.thomas.feastverse.dto.ingredient.*;
 import graber.thomas.feastverse.model.ingredient.Ingredient;
 import graber.thomas.feastverse.service.ingredient.IngredientService;
 import graber.thomas.feastverse.service.security.SecurityService;
+import graber.thomas.feastverse.utils.DeletedFilter;
 import graber.thomas.feastverse.utils.OwnershipFilter;
 import graber.thomas.feastverse.utils.VisibilityFilter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -55,6 +56,7 @@ public class IngredientController {
             @RequestParam(required = false) Long typeId,
             @RequestParam(required = false, defaultValue = "PUBLIC") VisibilityFilter visibility,
             @RequestParam(required = false, defaultValue = "ALL") OwnershipFilter ownership,
+            @RequestParam(required = false, defaultValue = "NOT_DELETED") DeletedFilter deletedStatus,
             @RequestParam(required = false) UUID ownerId,
             Pageable pageable
     ) {
@@ -62,10 +64,10 @@ public class IngredientController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You cannot filter by both typeId and typeName");
         }
         if(securityService.hasRole("ROLE_ADMINISTRATOR")){
-            return ingredientService.getAllIngredients(name, typeId, typeName, visibility, ownership,ownerId, pageable)
+            return ingredientService.getAllIngredients(name, typeId, typeName, visibility, ownership, deletedStatus, ownerId, pageable)
                     .map(ingredientMapper::toAdminViewDto);
         }
-        return ingredientService.getAllIngredients(name, typeId, typeName, visibility, ownership,ownerId, pageable)
+        return ingredientService.getAllIngredients(name, typeId, typeName, visibility, ownership, deletedStatus, ownerId, pageable)
                 .map(ingredientMapper::toPublicViewDto);
     }
 
