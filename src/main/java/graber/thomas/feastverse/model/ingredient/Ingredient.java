@@ -1,12 +1,15 @@
 package graber.thomas.feastverse.model.ingredient;
 
+import graber.thomas.feastverse.model.OwnableEntity;
+import graber.thomas.feastverse.utils.ImageUrlResolver;
 import jakarta.persistence.*;
+import org.hibernate.cfg.Environment;
 import org.hibernate.validator.constraints.Length;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @Entity
 @Table(name = "ingredients")
-public class Ingredient {
-
+public class Ingredient extends OwnableEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -30,11 +33,6 @@ public class Ingredient {
         this.type = type;
         this.image_file_name = image_file_name;
         this.description = description;
-    }
-
-    @Transient
-    public String getImage_url() {
-        return "/images/ingredient/" + image_file_name;
     }
 
     public Long getId() {
