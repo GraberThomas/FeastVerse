@@ -48,4 +48,9 @@ public class IngredientController {
         }
         return ingredientService.getAllIngredients(name, typeId, typeName, pageable).map(IngredientViewDto::fromEntity);
     }
+
+    @GetMapping("/{ingredientId}")
+    public IngredientViewDto getIngredient(@RequestParam Long ingredientId) {
+
+    }
 }
