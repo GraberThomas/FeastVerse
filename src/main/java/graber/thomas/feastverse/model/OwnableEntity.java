@@ -22,10 +22,6 @@ public abstract class OwnableEntity {
         this.owner = owner;
     }
 
-    public boolean isOwnedBy(User owner) {
-        return this.owner != null && this.owner.equals(owner);
-    }
-
     public boolean isPublic() {
         return isPublic;
     }
