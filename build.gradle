@@ -32,6 +32,9 @@ dependencies {
     // https://mvnrepository.com/artifact/org.apache.commons/commons-csv
     implementation 'org.apache.commons:commons-csv:1.13.0'
 
+    // https://mvnrepository.com/artifact/com.cloudinary/cloudinary-http44
+    implementation 'com.cloudinary:cloudinary-http44:1.39.0'
+
 
     // -- Runtime with jvm
     runtimeOnly 'com.h2database:h2'
