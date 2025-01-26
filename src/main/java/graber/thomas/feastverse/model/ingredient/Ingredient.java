@@ -1,11 +1,10 @@
 package graber.thomas.feastverse.model.ingredient;
 
 import graber.thomas.feastverse.model.OwnableEntity;
-import graber.thomas.feastverse.utils.ImageUrlResolver;
 import jakarta.persistence.*;
-import org.hibernate.cfg.Environment;
 import org.hibernate.validator.constraints.Length;
-import org.springframework.beans.factory.annotation.Autowired;
+
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "ingredients")
@@ -25,6 +24,9 @@ public class Ingredient extends OwnableEntity {
     private String description;
 
     private String image_file_name;
+
+    private LocalDate createdDate;
+    private LocalDate updatedDate;
 
     public Ingredient() {}
 
@@ -73,5 +75,21 @@ public class Ingredient extends OwnableEntity {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public LocalDate getCreatedDate() {
+        return createdDate;
+    }
+
+    public void setCreatedDate(LocalDate createdDate) {
+        this.createdDate = createdDate;
+    }
+
+    public LocalDate getUpdatedDate() {
+        return updatedDate;
+    }
+
+    public void setUpdatedDate(LocalDate updatedDate) {
+        this.updatedDate = updatedDate;
     }
 }

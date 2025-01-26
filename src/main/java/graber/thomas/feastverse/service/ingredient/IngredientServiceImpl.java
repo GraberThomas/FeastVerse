@@ -1,6 +1,7 @@
 package graber.thomas.feastverse.service.ingredient;
 
 import graber.thomas.feastverse.dto.ingredient.IngredientCreateDto;
+import graber.thomas.feastverse.exception.ForbiddenActionException;
 import graber.thomas.feastverse.model.ingredient.Ingredient;
 import graber.thomas.feastverse.model.ingredient.IngredientType;
 import graber.thomas.feastverse.model.user.User;
@@ -11,6 +12,8 @@ import graber.thomas.feastverse.repository.ingredients.IngredientTypeSpecificati
 import graber.thomas.feastverse.service.FileUploadService;
 import graber.thomas.feastverse.service.security.SecurityService;
 import graber.thomas.feastverse.service.user.UserService;
+import graber.thomas.feastverse.utils.OwnershipFilter;
+import graber.thomas.feastverse.utils.VisibilityFilter;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,7 +22,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class IngredientServiceImpl implements IngredientService{
@@ -49,10 +54,39 @@ public class IngredientServiceImpl implements IngredientService{
     }
 
     @Override
-    public Page<Ingredient> getAllIngredients(String name, Long ingredientTypeId, String ingredientTypeName, Pageable pageable) {
+    public     Page<Ingredient> getAllIngredients(
+            String name,
+            Long ingredientTypeId,
+            String ingredientTypeName,
+            VisibilityFilter visibilityFilter,
+            OwnershipFilter ownershipFilter,
+            UUID ownerId,
+            Pageable pageable
+    ){
+        if(visibilityFilter != VisibilityFilter.PUBLIC){
+            if(!securityService.hasRole("ROLE_ADMINISTRATOR")){
+                throw new ForbiddenActionException("Only administrator can get hidden ingredients");
+            }
+        }
+
+        if(ownerId != null && ownershipFilter != OwnershipFilter.ALL){
+            throw new IllegalArgumentException("You cannot filter by ownership and id of owner");
+        }
+
         Specification<Ingredient> spec = IngredientSpecifications.hasName(name);
+        spec = spec.and(IngredientSpecifications.hasOwner(ownerId));
         spec = spec.and(IngredientSpecifications.hasIngredientType(ingredientTypeId));
         spec = spec.and(IngredientSpecifications.hasIngredientTypeName(ingredientTypeName));
+        if(visibilityFilter == VisibilityFilter.PUBLIC){
+            spec = spec.and(IngredientSpecifications.isPublic());
+        }else if(visibilityFilter == VisibilityFilter.PRIVATE){
+            spec = spec.and(IngredientSpecifications.isPrivate());
+        }
+        if(ownershipFilter == OwnershipFilter.CREATED){
+            spec=spec.and(IngredientSpecifications.isCreated());
+        }else if(ownershipFilter == OwnershipFilter.DEFAULT){
+            spec=spec.and(IngredientSpecifications.isDefault());
+        }
         return this.ingredientRepository.findAll(spec, pageable);
     }
 
@@ -88,6 +122,9 @@ public class IngredientServiceImpl implements IngredientService{
         ingredient.setType(ingredientType);
         ingredient.setImage_file_name(fileUrl);
         ingredient.setOwner(owner);
+        ingredient.setPublic(ingredientCreateDto.isPublic());
+        ingredient.setDeleted(false);
+        ingredient.setCreatedDate(LocalDate.now());
 
         // Save the ingredient to the database
         return Optional.of(ingredientRepository.save(ingredient));

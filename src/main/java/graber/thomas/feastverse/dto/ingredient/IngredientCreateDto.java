@@ -12,6 +12,9 @@ public record IngredientCreateDto(
         String description,
 
         @NotNull
-        Long typeId
+        Long typeId,
+
+        @NotNull
+        Boolean isPublic
 ) {
 }
