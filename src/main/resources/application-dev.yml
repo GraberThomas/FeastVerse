@@ -1,0 +1,4 @@
+upload:
+  storage-type: local
+  local:
+    directory: upload
