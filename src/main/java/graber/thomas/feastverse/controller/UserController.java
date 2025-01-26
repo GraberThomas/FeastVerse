@@ -83,6 +83,15 @@ public class UserController {
         );
     }
 
+    @GetMapping("/me")
+    @PreAuthorize("isAuthenticated()")
+    public UserView getSelf() {
+        UUID currentUserId = securityService.getCurrentUserId();
+        return this.userService.get(currentUserId)
+                .map(userMapper::toSelfUserDto)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+    }
+
     @PreAuthorize("hasRole('ROLE_ADMINISTRATOR') or #userId == authentication.principal.id")
     @PatchMapping("/{userId}")
     public UserView updateUser(@PathVariable UUID userId, @Valid @RequestBody UpdateDto updateDto) {
