@@ -7,8 +7,6 @@ build/
 .env
 *.env*
 
-.src/main/resources/static/upload/*
-
 ### IntelliJ IDEA ###
 .idea/modules.xml
 .idea/jarRepositories.xml
@@ -45,3 +43,4 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+/src/main/resources/static/upload/*
