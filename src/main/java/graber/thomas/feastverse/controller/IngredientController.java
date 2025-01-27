@@ -2,6 +2,7 @@ package graber.thomas.feastverse.controller;
 
 import graber.thomas.feastverse.dto.ingredient.*;
 import graber.thomas.feastverse.model.ingredient.Ingredient;
+import graber.thomas.feastverse.model.user.UserType;
 import graber.thomas.feastverse.service.ingredient.IngredientService;
 import graber.thomas.feastverse.service.security.SecurityService;
 import graber.thomas.feastverse.utils.DeletedFilter;
@@ -68,7 +69,7 @@ public class IngredientController {
         if(typeId != null && typeName != null){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You cannot filter by both typeId and typeName");
         }
-        if(securityService.hasRole("ROLE_ADMINISTRATOR")){
+        if(securityService.hasRole(UserType.ADMINISTRATOR)){
             return ingredientService.getAllIngredients(name, typeId, typeName, visibility, ownership, deletedStatus, ownerId, pageable)
                     .map(ingredientMapper::toAdminViewDto);
         }
@@ -81,7 +82,7 @@ public class IngredientController {
         Ingredient ingredient = ingredientService.getIngredientById(ingredientId).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ingredient not found for id " + ingredientId + ".")
         );
-        if(securityService.hasRole("ROLE_ADMINISTRATOR")){
+        if(securityService.hasRole(UserType.ADMINISTRATOR)){
             return ingredientMapper.toAdminViewDto(ingredient);
         }
 
@@ -97,7 +98,7 @@ public class IngredientController {
         Ingredient ingredient = ingredientService.createIngredient(ingredientDto, file).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to create ingredient.")
         );
-        if(securityService.hasRole("ROLE_ADMINISTRATOR")){
+        if(securityService.hasRole(UserType.ADMINISTRATOR)){
             return ingredientMapper.toAdminViewDto(ingredient);
         }
         return ingredientMapper.toPublicViewDto(ingredient);
@@ -128,7 +129,7 @@ public class IngredientController {
             @PathVariable Long ingredientId,
             @RequestParam(required = false, defaultValue = "false") Boolean hardDelete
     ) {
-        if(!securityService.hasRole("ROLE_ADMINISTRATOR") && hardDelete){
+        if(!securityService.hasRole(UserType.ADMINISTRATOR) && hardDelete){
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only administrator can perform hard delete.");
         }
 

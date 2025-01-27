@@ -68,14 +68,10 @@ public class IngredientSpecifications {
     }
 
     public static Specification<Ingredient> isNotDeleted() {
-        return (root, query, criteriaBuilder) -> {
-            return criteriaBuilder.equal(root.get("isDeleted"), false);
-        };
+        return (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("isDeleted"), false);
     }
 
     public static Specification<Ingredient> isDeleted() {
-        return (root, query, criteriaBuilder) -> {
-            return criteriaBuilder.equal(root.get("isDeleted"), true);
-        };
+        return (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("isDeleted"), true);
     }
 }

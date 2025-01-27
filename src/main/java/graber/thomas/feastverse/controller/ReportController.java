@@ -33,13 +33,11 @@ import java.util.UUID;
 public class ReportController {
     private static final Logger logger = LoggerFactory.getLogger(ReportController.class);
     private final ReportService reportService;
-    private final SecurityService securityService;
     private final ReportMapper reportMapper;
     private final UserService userService;
 
     public ReportController(ReportService reportService, SecurityService securityService, ReportMapper reportMapper, UserService userService) {
         this.reportService = reportService;
-        this.securityService = securityService;
         this.reportMapper = reportMapper;
         this.userService = userService;
     }

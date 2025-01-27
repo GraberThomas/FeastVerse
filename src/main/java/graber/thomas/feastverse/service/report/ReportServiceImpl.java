@@ -9,6 +9,7 @@ import graber.thomas.feastverse.model.report.Report;
 import graber.thomas.feastverse.model.report.ReportType;
 import graber.thomas.feastverse.model.report.Reportable;
 import graber.thomas.feastverse.model.user.User;
+import graber.thomas.feastverse.model.user.UserType;
 import graber.thomas.feastverse.repository.report.ReportRepository;
 import graber.thomas.feastverse.repository.report.ReportSpecifications;
 import graber.thomas.feastverse.service.security.SecurityService;
@@ -90,7 +91,7 @@ public class ReportServiceImpl implements ReportService {
                 reportUpdateDto.getResolved()
         );
 
-        if(securityService.hasRole("ROLE_MODERATOR")) {
+        if(securityService.hasRole(UserType.MODERATOR)) {
             if(
                     reportUpdateDto.isTargetIdProvided() ||
                     reportUpdateDto.isReporterIdProvided() ||

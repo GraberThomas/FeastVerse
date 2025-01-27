@@ -31,7 +31,7 @@ public interface UserService {
                                   String pseudo,
                                   String email,
                                   Pageable pageable
-    ) throws AccessDeniedException, IllegalArgumentException;
+    ) throws IllegalArgumentException;
 
     /**
      * Get user by username (username)

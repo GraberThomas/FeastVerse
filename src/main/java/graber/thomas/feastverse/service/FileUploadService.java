@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
+import java.util.Objects;
 
 @Service
 public class FileUploadService {
@@ -59,7 +60,7 @@ public class FileUploadService {
         }
 
         // Sauvegarder le fichier
-        Path targetPath = uploadPath.resolve(file.getOriginalFilename());
+        Path targetPath = uploadPath.resolve(Objects.requireNonNull(file.getOriginalFilename()));
         file.transferTo(targetPath.toFile());
         return file.getOriginalFilename(); // Retourner seulement le nom du fichier
     }

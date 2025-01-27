@@ -1,6 +1,5 @@
 package graber.thomas.feastverse.utils;
 
-import graber.thomas.feastverse.model.user.User;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 

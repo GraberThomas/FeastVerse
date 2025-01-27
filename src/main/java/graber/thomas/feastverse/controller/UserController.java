@@ -4,6 +4,7 @@ import graber.thomas.feastverse.dto.user.UpdateDto;
 import graber.thomas.feastverse.dto.user.UserMapper;
 import graber.thomas.feastverse.dto.user.UserView;
 import graber.thomas.feastverse.model.user.User;
+import graber.thomas.feastverse.model.user.UserType;
 import graber.thomas.feastverse.service.security.SecurityService;
 import graber.thomas.feastverse.service.user.UserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -43,7 +44,7 @@ public class UserController {
         User user = this.userService.get(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-        boolean isAdmin = securityService.hasRole("ROLE_ADMINISTRATOR");
+        boolean isAdmin = securityService.hasRole(UserType.ADMINISTRATOR);
         String currentUserId = SecurityContextHolder.getContext().getAuthentication().getName();
         boolean requestedUserIsSelf = userId.toString().equals(currentUserId);
 
@@ -65,15 +66,13 @@ public class UserController {
             @RequestParam(required = false) String email,
             Pageable pageable
     ) {
-        boolean isAdmin = securityService.hasRole("ROLE_ADMINISTRATOR");
+        boolean isAdmin = securityService.hasRole(UserType.ADMINISTRATOR);
         Page<User> users;
 
         try {
             users = userService.getAllUsers(role, lastName, firstName, pseudo, email, pageable);
         } catch (IllegalArgumentException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
-        } catch (AccessDeniedException e) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, e.getMessage());
         }
 
         return users.map(user ->
@@ -106,7 +105,7 @@ public class UserController {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, e.getMessage());
         }
 
-        final boolean isAdmin = securityService.hasRole("ROLE_ADMINISTRATOR");
+        final boolean isAdmin = securityService.hasRole(UserType.ADMINISTRATOR);
 
         if (isAdmin) {
             return userMapper.toAdminUserDto(updatedUser);

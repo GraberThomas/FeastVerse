@@ -38,9 +38,7 @@ public class MyUserDetailsService implements UserDetailsService {
     public UserDetails loadUserById(UUID id) throws UsernameNotFoundException {
         return userService.getById(id)
                 .map(this::buildUserDetails)
-                .orElseThrow(() -> {
-                    return new UsernameNotFoundException("Authenticated user don't exist");
-                });
+                .orElseThrow(() -> new UsernameNotFoundException("Authenticated user don't exist"));
     }
 
 

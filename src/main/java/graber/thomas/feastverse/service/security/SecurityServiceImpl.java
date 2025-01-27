@@ -1,5 +1,6 @@
 package graber.thomas.feastverse.service.security;
 
+import graber.thomas.feastverse.model.user.UserType;
 import graber.thomas.feastverse.security.CustomUserDetails;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -11,10 +12,11 @@ import java.util.UUID;
 public class SecurityServiceImpl implements SecurityService {
 
     @Override
-    public boolean hasRole(String role) {
+    public boolean hasRole(UserType role) {
+        String roleName = "ROLE_" + role.name();
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return authentication != null && authentication.getAuthorities().stream()
-                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals(role));
+                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals(roleName));
     }
 
     @Override

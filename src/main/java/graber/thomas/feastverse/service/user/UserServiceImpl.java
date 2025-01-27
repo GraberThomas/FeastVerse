@@ -46,10 +46,10 @@ public class UserServiceImpl implements UserService {
                                   String pseudo,
                                   String email,
                                   Pageable pageable
-    ) throws ForbiddenActionException, IllegalArgumentException {
+    ) throws IllegalArgumentException {
         boolean hasFilter = hasFilter(role, lastName, firstName, pseudo, email);
 
-        if (hasFilter && !securityService.hasRole("ROLE_ADMINISTRATOR")) {
+        if (hasFilter && !securityService.hasRole(UserType.ADMINISTRATOR)) {
             throw new ForbiddenActionException("Only administrators can use filters on users.");
         }
 
@@ -124,7 +124,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Optional<User> patch(User user, UpdateDto updateDto) throws AccessDeniedException {
-        final boolean isAdmin = securityService.hasRole("ROLE_ADMINISTRATOR");
+        final boolean isAdmin = securityService.hasRole(UserType.ADMINISTRATOR);
 
         if(!isAdmin && updateDto.roles() != null){
             throw new AccessDeniedException("Only administrators can update roles.");

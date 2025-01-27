@@ -7,6 +7,7 @@ import graber.thomas.feastverse.exception.ForbiddenActionException;
 import graber.thomas.feastverse.model.ingredient.Ingredient;
 import graber.thomas.feastverse.model.ingredient.IngredientType;
 import graber.thomas.feastverse.model.user.User;
+import graber.thomas.feastverse.model.user.UserType;
 import graber.thomas.feastverse.repository.ingredients.IngredientRepository;
 import graber.thomas.feastverse.repository.ingredients.IngredientSpecifications;
 import graber.thomas.feastverse.repository.ingredients.IngredientTypeRepository;
@@ -81,12 +82,12 @@ public class IngredientServiceImpl implements IngredientService {
             deletedStatus = DeletedFilter.NOT_DELETED;
         }
         if (visibilityFilter != VisibilityFilter.PUBLIC) {
-            if (!securityService.hasRole("ROLE_ADMINISTRATOR")) {
+            if (!securityService.hasRole(UserType.ADMINISTRATOR)) {
                 throw new ForbiddenActionException("Only administrator can get hidden ingredients");
             }
         }
         if (deletedStatus != DeletedFilter.NOT_DELETED) {
-            if (!securityService.hasRole("ROLE_ADMINISTRATOR")) {
+            if (!securityService.hasRole(UserType.ADMINISTRATOR)) {
                 throw new ForbiddenActionException("Only administrator can get filter by deleted status");
             }
         }
@@ -125,7 +126,7 @@ public class IngredientServiceImpl implements IngredientService {
                 () -> new EntityNotFoundException("Ingredient not found for ID: " + id)
         );
 
-        if(securityService.hasRole("ROLE_ADMINISTRATOR")) {
+        if(securityService.hasRole(UserType.ADMINISTRATOR)) {
             return Optional.of(ingredient);
         }
 
@@ -156,7 +157,7 @@ public class IngredientServiceImpl implements IngredientService {
 
         // Upload the file and get its URL (if provided)
         String fileUrl = null;
-        if (file != null && !file.isEmpty()) {
+        if (!file.isEmpty()) {
             try {
                 fileUrl = fileUploadService.uploadFile(file);
 
@@ -183,7 +184,7 @@ public class IngredientServiceImpl implements IngredientService {
     @Override
     public Ingredient patchIngredient(Ingredient ingredient, IngredientPatchDto ingredientPatchDto, MultipartFile file) throws FileUploadException {
         UUID userId = securityService.getCurrentUserId();
-        if (!securityService.hasRole("ROLE_ADMINISTRATOR") && !ingredient.getOwner().getId().equals(userId)) {
+        if (!securityService.hasRole(UserType.ADMINISTRATOR) && !ingredient.getOwner().getId().equals(userId)) {
             throw new ForbiddenActionException("You are not allowed to modify this ingredient.");
         }
 
@@ -211,7 +212,7 @@ public class IngredientServiceImpl implements IngredientService {
         }
 
         if (ingredientPatchDto.isOwnerIdProvided()) {
-            if (!securityService.hasRole("ROLE_ADMINISTRATOR")) {
+            if (!securityService.hasRole(UserType.ADMINISTRATOR)) {
                 throw new ForbiddenActionException("Only administrator can change owner of ingredient.");
             }
             User newOwner = userService.getById(ingredientPatchDto.getOwnerId()).orElseThrow(
@@ -238,7 +239,7 @@ public class IngredientServiceImpl implements IngredientService {
     @Override
     public void deleteIngredient(Long id, Boolean hardDelete) {
         if (hardDelete) {
-            if (!securityService.hasRole("ROLE_ADMINISTRATOR")) {
+            if (!securityService.hasRole(UserType.ADMINISTRATOR)) {
                 throw new ForbiddenActionException("Only administrator can delete ingredients.");
             }
             Ingredient toDelete = this.ingredientRepository.findById(id).orElseThrow(
@@ -253,7 +254,7 @@ public class IngredientServiceImpl implements IngredientService {
             Ingredient toDelete = this.getIngredientById(id).orElseThrow(
                     () -> new EntityNotFoundException("Ingredient not found for ID: " + id)
             );
-            if(!securityService.hasRole("ROLE_ADMINISTRATOR")){
+            if(!securityService.hasRole(UserType.ADMINISTRATOR)){
                 if(!this.isUserOwner(toDelete, securityService.getCurrentUserId())){
                     throw new ForbiddenActionException("You are not allowed to delete this ingredient.");
                 }
