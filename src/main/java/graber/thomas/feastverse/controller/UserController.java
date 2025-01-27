@@ -1,10 +1,13 @@
 package graber.thomas.feastverse.controller;
 
+import graber.thomas.feastverse.dto.reports.ReportMapper;
+import graber.thomas.feastverse.dto.reports.ReportViewDTO;
 import graber.thomas.feastverse.dto.user.UpdateDto;
 import graber.thomas.feastverse.dto.user.UserMapper;
 import graber.thomas.feastverse.dto.user.UserView;
 import graber.thomas.feastverse.model.user.User;
 import graber.thomas.feastverse.model.user.UserType;
+import graber.thomas.feastverse.service.report.ReportService;
 import graber.thomas.feastverse.service.security.SecurityService;
 import graber.thomas.feastverse.service.user.UserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -30,13 +33,17 @@ public class UserController {
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
     private final UserService userService;
     private final SecurityService securityService;
+    private final ReportService reportService;
     private final UserMapper userMapper;
+    private final ReportMapper reportMapper;
 
 
-    public UserController(UserService userService, SecurityService securityService, UserMapper userMapper) {
+    public UserController(UserService userService, SecurityService securityService, ReportService reportService, UserMapper userMapper, ReportMapper reportMapper) {
         this.userService = userService;
+        this.reportService = reportService;
         this.userMapper = userMapper;
         this.securityService = securityService;
+        this.reportMapper = reportMapper;
     }
 
     @GetMapping("/{userId}")
@@ -112,6 +119,12 @@ public class UserController {
         } else {
             return userMapper.toSelfUserDto(updatedUser);
         }
+    }
+
+    @PreAuthorize("hasAnyRole('ROLE_ADMINISTRATOR', 'ROLE_MODERATOR')")
+    @GetMapping("/{userId}/reports")
+    public Page<ReportViewDTO> getReportsForUser(@PathVariable UUID userId, Pageable pageable) {
+        return reportService.getByTarget(pageable, userId).map(reportMapper::toReportView);
     }
 
 

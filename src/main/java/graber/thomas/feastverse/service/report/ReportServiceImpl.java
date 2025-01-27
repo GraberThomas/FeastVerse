@@ -172,7 +172,14 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     public Page<Report> getByTarget(Pageable pageable, UUID targetId) {
-        return null;
+        if(targetId == null){
+            throw new InvalidNullProperty("targetId");
+        }
+        User user = userService.getById(targetId).orElseThrow(
+                () -> new EntityNotFoundException("User not found for ID: " + targetId)
+        );
+
+        return reportRepository.findAllByTargetId(targetId, pageable);
     }
 
     @Override
