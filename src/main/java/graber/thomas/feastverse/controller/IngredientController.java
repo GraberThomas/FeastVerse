@@ -122,6 +122,7 @@ public class IngredientController {
         return dto;
     }
 
+    @PreAuthorize("isAuthenticated()")
     @DeleteMapping("/{ingredientId}")
     public ResponseEntity<Void> deleteIngredient(
             @PathVariable Long ingredientId,

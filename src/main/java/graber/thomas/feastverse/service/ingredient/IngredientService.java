@@ -7,6 +7,7 @@ import graber.thomas.feastverse.model.ingredient.IngredientType;
 import graber.thomas.feastverse.utils.DeletedFilter;
 import graber.thomas.feastverse.utils.OwnershipFilter;
 import graber.thomas.feastverse.utils.VisibilityFilter;
+import org.apache.tomcat.util.http.fileupload.FileUploadException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
@@ -32,9 +33,9 @@ public interface IngredientService {
 
     Optional<Ingredient> getIngredientById(Long id);
 
-    Optional<Ingredient> createIngredient(IngredientCreateDto ingredientCreateDto, MultipartFile file);
+    Optional<Ingredient> createIngredient(IngredientCreateDto ingredientCreateDto, MultipartFile file) throws FileUploadException;
 
-    Ingredient patchIngredient(Ingredient ingredient, IngredientPatchDto ingredientPatchDto, MultipartFile file);
+    Ingredient patchIngredient(Ingredient ingredient, IngredientPatchDto ingredientPatchDto, MultipartFile file) throws FileUploadException;
 
     void deleteIngredient(Long id, Boolean hardDelete);
 }
