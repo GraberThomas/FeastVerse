@@ -10,6 +10,7 @@ import graber.thomas.feastverse.utils.OwnershipFilter;
 import graber.thomas.feastverse.utils.VisibilityFilter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.apache.tomcat.util.http.fileupload.FileUploadException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -94,7 +95,7 @@ public class IngredientController {
     public IngredientViewDto createIngredient(
             @Valid @RequestPart("ingredient") IngredientCreateDto ingredientDto,
             @RequestPart(value = "file", required = false) MultipartFile file
-    ) {
+    ) throws FileUploadException {
         Ingredient ingredient = ingredientService.createIngredient(ingredientDto, file).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to create ingredient.")
         );
@@ -110,7 +111,7 @@ public class IngredientController {
             @PathVariable Long ingredientId,
             @Valid @RequestPart("ingredient") IngredientPatchDto ingredientPatchDto,
             @RequestPart(value = "file", required = false) MultipartFile file
-    ){
+    ) throws FileUploadException {
         Ingredient ingredient = ingredientService.getIngredientById(ingredientId).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ingredient not found for id " + ingredientId + ".")
         );

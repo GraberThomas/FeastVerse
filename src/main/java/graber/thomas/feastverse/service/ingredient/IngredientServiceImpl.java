@@ -2,7 +2,6 @@ package graber.thomas.feastverse.service.ingredient;
 
 import graber.thomas.feastverse.dto.ingredient.IngredientCreateDto;
 import graber.thomas.feastverse.dto.ingredient.IngredientPatchDto;
-import graber.thomas.feastverse.exception.FileDeleteException;
 import graber.thomas.feastverse.exception.ForbiddenActionException;
 import graber.thomas.feastverse.model.ingredient.Ingredient;
 import graber.thomas.feastverse.model.ingredient.IngredientType;
@@ -20,9 +19,11 @@ import graber.thomas.feastverse.utils.ImageUrlResolver;
 import graber.thomas.feastverse.utils.OwnershipFilter;
 import graber.thomas.feastverse.utils.VisibilityFilter;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import org.apache.tomcat.util.http.fileupload.FileUploadException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -134,7 +135,7 @@ public class IngredientServiceImpl implements IngredientService {
             throw new EntityNotFoundException("Ingredient not found for ID: " + id);
         }
 
-        if(!ingredient.getIsPublic() && ingredient.getOwner() != null && !ingredient.getOwner().getId().equals(userId)){
+        if(!ingredient.getIsPublic() && !this.isUserOwner(ingredient, userId)){
             throw new ForbiddenActionException("You are not allowed to access this ingredient.");
         }
 
@@ -143,10 +144,6 @@ public class IngredientServiceImpl implements IngredientService {
 
     @Override
     public Optional<Ingredient> createIngredient(IngredientCreateDto ingredientCreateDto, MultipartFile file) throws FileUploadException {
-        logger.info("Inter in createIngredient");
-        logger.info(ingredientCreateDto.toString());
-        logger.info(file.toString());
-
         User owner = userService.getById(securityService.getCurrentUserId()).orElseThrow(
                 () -> new EntityNotFoundException("No user found for ID: " + securityService.getCurrentUserId())
         );
@@ -182,35 +179,76 @@ public class IngredientServiceImpl implements IngredientService {
     }
 
     @Override
-    public Ingredient patchIngredient(Ingredient ingredient, IngredientPatchDto ingredientPatchDto, MultipartFile file) throws FileUploadException {
+    @Transactional
+    public Ingredient patchIngredient(Ingredient ingredient, IngredientPatchDto ingredientPatchDto, MultipartFile file) {
+        // Validate user permissions
+        validateUserPermissions(ingredient);
+
+        // Store the original state for rollback
+        Ingredient originalIngredient = new Ingredient();
+        BeanUtils.copyProperties(ingredient, originalIngredient);
+
+        try {
+            // Handle file update
+            handleFileUpdate(ingredient, file);
+
+            // Apply patch updates
+            applyPatchUpdates(ingredient, ingredientPatchDto);
+
+            // Save the updated ingredient
+            return saveIngredient(ingredient);
+        } catch (Exception e) {
+            // Rollback to the original state if any operation fails
+            BeanUtils.copyProperties(originalIngredient, ingredient);
+            logger.error("Failed to patch ingredient. Rolling back changes.", e);
+            throw new RuntimeException("Failed to patch ingredient", e);
+        }
+    }
+
+    private void validateUserPermissions(Ingredient ingredient) {
         UUID userId = securityService.getCurrentUserId();
         if (!securityService.hasRole(UserType.ADMINISTRATOR) && !ingredient.getOwner().getId().equals(userId)) {
             throw new ForbiddenActionException("You are not allowed to modify this ingredient.");
         }
+    }
 
+    private void handleFileUpdate(Ingredient ingredient, MultipartFile file) {
         if (file != null) {
             if (!file.isEmpty()) {
-                boolean fileDeleted = fileUploadService.deleteFile(imageUrlResolver.extractFileNameWithoutExtension(ingredient.getImage_file_name()));
-                if (!fileDeleted) {
-                    throw new FileDeleteException("Unable to patch the file.");
-                }
+                // Upload the new file first
                 String fileUrl;
                 try {
                     fileUrl = fileUploadService.uploadFile(file);
                 } catch (IOException e) {
-                    throw new FileUploadException("Failed to upload file", e);
+                    logger.error("Failed to upload file", e);
+                    throw new RuntimeException("Failed to upload file", e);
                 }
+
+                // If the new file upload is successful, delete the old file
+                if (ingredient.getImage_file_name() != null) {
+                    boolean fileDeleted = fileUploadService.deleteFile(imageUrlResolver.extractFileNameWithoutExtension(ingredient.getImage_file_name()));
+                    if (!fileDeleted) {
+                        logger.warn("Failed to delete old file: " + ingredient.getImage_file_name());
+                    }
+                }
+
+                // Update the ingredient with the new file URL
                 ingredient.setImage_file_name(fileUrl);
-                logger.info(fileUrl);
+                logger.info("New file uploaded: " + fileUrl);
             } else {
-                boolean fileDeleted = fileUploadService.deleteFile(imageUrlResolver.extractFileNameWithoutExtension(ingredient.getImage_file_name()));
-                if (!fileDeleted) {
-                    throw new FileDeleteException("Unable to patch the file.");
+                // If the file is empty, delete the old file
+                if (ingredient.getImage_file_name() != null) {
+                    boolean fileDeleted = fileUploadService.deleteFile(imageUrlResolver.extractFileNameWithoutExtension(ingredient.getImage_file_name()));
+                    if (!fileDeleted) {
+                        logger.warn("Failed to delete old file: " + ingredient.getImage_file_name());
+                    }
                 }
                 ingredient.setImage_file_name(null);
             }
         }
+    }
 
+    private void applyPatchUpdates(Ingredient ingredient, IngredientPatchDto ingredientPatchDto) {
         if (ingredientPatchDto.isOwnerIdProvided()) {
             if (!securityService.hasRole(UserType.ADMINISTRATOR)) {
                 throw new ForbiddenActionException("Only administrator can change owner of ingredient.");
@@ -227,13 +265,18 @@ public class IngredientServiceImpl implements IngredientService {
             ingredient.setDescription(ingredientPatchDto.getDescription());
         }
         if (ingredientPatchDto.isPublicProvided()) {
-            ingredientPatchDto.setPublic(ingredientPatchDto.getPublic());
+            ingredient.setPublic(ingredientPatchDto.getPublic());
         }
         if (ingredientPatchDto.isTypeProvided()) {
-            ingredientPatchDto.setType(ingredientPatchDto.getType());
+            IngredientType ingredientType = this.getIngredientTypeById(ingredientPatchDto.getType()).orElseThrow(
+                    () -> new EntityNotFoundException("No ingredient type found for ID: " + ingredientPatchDto.getType())
+            );
+            ingredient.setType(ingredientType);
         }
-        this.ingredientRepository.save(ingredient);
-        return ingredient;
+    }
+
+    private Ingredient saveIngredient(Ingredient ingredient) {
+        return this.ingredientRepository.save(ingredient);
     }
 
     @Override
@@ -265,9 +308,6 @@ public class IngredientServiceImpl implements IngredientService {
     }
 
     public boolean isUserOwner(Ingredient ingredient, UUID userId) {
-        if (ingredient.getOwner() == null) {
-            return false;
-        }
-        return ingredient.getOwner().getId().equals(userId);
+        return ingredient.getOwner() != null && ingredient.getOwner().getId().equals(userId);
     }
 }
