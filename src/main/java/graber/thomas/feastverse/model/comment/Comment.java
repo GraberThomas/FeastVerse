@@ -1,7 +1,6 @@
 package graber.thomas.feastverse.model.comment;
 
 import graber.thomas.feastverse.model.OwnableEntity;
-import graber.thomas.feastverse.model.user.User;
 import jakarta.persistence.*;
 import org.hibernate.annotations.ColumnDefault;
 
@@ -39,4 +38,24 @@ public class Comment extends OwnableEntity {
     public UUID getId() { return id; }
     public String getText() { return text; }
     public LocalDateTime getCreatedAt() { return createdAt; }
+
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
+    public void setText(String text) {
+        this.text = text;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Commentable getParent() {
+        return parent;
+    }
+
+    public void setParent(Commentable parent) {
+        this.parent = parent;
+    }
 }
