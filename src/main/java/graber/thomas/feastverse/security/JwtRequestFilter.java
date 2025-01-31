@@ -1,12 +1,14 @@
 package graber.thomas.feastverse.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import graber.thomas.feastverse.exception.ErrorResponse;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -30,7 +32,10 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     private JwtUtil jwtUtil;
 
     @Autowired
-    private AuthEntryPointJwt unauthorizedHandler; // Ajout de l'AuthEntryPointJwt
+    private AuthEntryPointJwt unauthorizedHandler;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @Override
     protected void doFilterInternal(
@@ -81,12 +86,15 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         }catch (ExpiredJwtException ex) {
             response.setContentType("application/json");
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write(new ObjectMapper().writeValueAsString(Map.of(
-                    "error", "Unauthorized",
-                    "message", "Token expired at: " + ex.getClaims().getExpiration(),
-                    "path", request.getRequestURI(),
-                    "timestamp", OffsetDateTime.now().toString()
-            )));
+            ErrorResponse errorResponse = new ErrorResponse(
+                    HttpStatus.UNAUTHORIZED.value(),
+                    HttpStatus.UNAUTHORIZED.getReasonPhrase(),
+                    "Token expired at: " + ex.getClaims().getExpiration(),
+                    request.getRequestURI(),
+                    null
+            );
+            response.getWriter().write(objectMapper.writeValueAsString(errorResponse));
+            response.getWriter().flush();
         } catch (Exception ex) {
             ex.printStackTrace();
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);

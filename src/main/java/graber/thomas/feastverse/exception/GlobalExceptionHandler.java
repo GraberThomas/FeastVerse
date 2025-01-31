@@ -25,145 +25,163 @@ import java.util.UUID;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
+    private String getPath(WebRequest request){
+        return request.getDescription(false).replace("uri=", "");
+    }
+
     @ExceptionHandler(UsernameNotFoundException.class)
-    public ResponseEntity<Map<String, Object>> handleUsernameNotFoundException(
+    public ResponseEntity<ErrorResponse> handleUsernameNotFoundException(
             UsernameNotFoundException ex, WebRequest request
     ){
-        Map<String, Object> response = new HashMap<>();
-        response.put("timestamp", OffsetDateTime.now());
-        response.put("status", HttpStatus.UNAUTHORIZED.value());
-        response.put("error", HttpStatus.UNAUTHORIZED.getReasonPhrase());
-        response.put("message", "Token invalid or expired.");
-        response.put("path", request.getDescription(false).replace("uri=", ""));
+        ErrorResponse res = new ErrorResponse(
+                HttpStatus.UNAUTHORIZED.value(),
+                HttpStatus.UNAUTHORIZED.getReasonPhrase(),
+                "Token invalid or expired.",
+                this.getPath(request),
+                null
+        );
 
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(res);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, Object>> handleValidationExceptions(
+    public ResponseEntity<ErrorResponse> handleValidationExceptions(
             MethodArgumentNotValidException ex,
             WebRequest request
     ) {
-        Map<String, Object> response = new HashMap<>();
         Map<String, String> errors = new HashMap<>();
 
         for (FieldError error : ex.getBindingResult().getFieldErrors()) {
             errors.put(error.getField(), error.getDefaultMessage());
         }
 
-        response.put("timestamp", OffsetDateTime.now()); // Timestamp dans le format ISO-8601
-        response.put("status", HttpStatus.BAD_REQUEST.value());
-        response.put("errors", errors);
-        response.put("message", "Validation failed");
-        response.put("path", request.getDescription(false).replace("uri=", ""));
+        ErrorResponse response = new ErrorResponse(
+                HttpStatus.BAD_REQUEST.value(),
+                HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                "Validation failed",
+                this.getPath(request),
+                errors
+        );
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
     @ExceptionHandler(UserAlreadyExistsException.class)
-    public ResponseEntity<Map<String, Object>> handleUserAlreadyExistsException(
+    public ResponseEntity<ErrorResponse> handleUserAlreadyExistsException(
             UserAlreadyExistsException ex,
             WebRequest request
     ) {
-        Map<String, Object> response = new HashMap<>();
-        response.put("timestamp", OffsetDateTime.now());
-        response.put("status", HttpStatus.CONFLICT.value());
-        response.put("error", HttpStatus.CONFLICT.getReasonPhrase());
-        response.put("message", ex.getMessage());
-        response.put("path", request.getDescription(false).replace("uri=", ""));
+        ErrorResponse response = new ErrorResponse(
+                HttpStatus.CONFLICT.value(),
+                HttpStatus.CONFLICT.getReasonPhrase(),
+                ex.getMessage(),
+                this.getPath(request),
+                null
+        );
 
         return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<Map<String, Object>> handleHttpMessageNotReadable(
+    public ResponseEntity<ErrorResponse> handleHttpMessageNotReadable(
             HttpMessageNotReadableException ex,
             WebRequest request
     ) {
-        Map<String, Object> response = new HashMap<>();
-        response.put("timestamp", OffsetDateTime.now());
-        response.put("status", HttpStatus.BAD_REQUEST.value());
-        response.put("error", HttpStatus.BAD_REQUEST.getReasonPhrase());
-        response.put("message", "The request body is missing or invalid.");
-        response.put("path", request.getDescription(false).replace("uri=", ""));
+        // Build your final error message
+        String userFriendlyMessage = "Invalid or malformed JSON. " +
+                "Check that your request body matches the expected format.";
+
+
+        ErrorResponse response = new ErrorResponse(
+                HttpStatus.BAD_REQUEST.value(),
+                HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                userFriendlyMessage,
+                getPath(request),
+                null
+        );
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    public ResponseEntity<Map<String, Object>> handleMethodArgumentTypeMismatch(
+    public ResponseEntity<ErrorResponse> handleMethodArgumentTypeMismatch(
             MethodArgumentTypeMismatchException ex, WebRequest request) {
-        Map<String, Object> response = new HashMap<>();
-        response.put("timestamp", OffsetDateTime.now());
-        response.put("status", HttpStatus.BAD_REQUEST.value());
-        response.put("error", "Bad Request");
 
-        // Vérifie si l'erreur concerne un UUID
+        String message = "";
         if (ex.getRequiredType() != null && ex.getRequiredType().equals(UUID.class)) {
-            response.put("message", "Invalid UUID format: " + ex.getValue());
+            message =  "Invalid UUID format: " + ex.getValue();
         } else {
-            // Message générique pour d'autres types de mismatch
-            response.put("message", "Invalid value for parameter '" + ex.getName() +
-                    "'. Expected type: " + (ex.getRequiredType() != null ? ex.getRequiredType().getSimpleName() : "unknown"));
+            message=  "Invalid value for parameter '" + ex.getName() +
+                    "'. Expected type: " + (ex.getRequiredType() != null ? ex.getRequiredType().getSimpleName() : "unknown");
         }
 
-        response.put("path", request.getDescription(false).replace("uri=", ""));
+        ErrorResponse response = new ErrorResponse(
+                HttpStatus.BAD_REQUEST.value(),
+                HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                message,
+                getPath(request),
+                null
+        );
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
     @ExceptionHandler(SelfReportingException.class)
-    public ResponseEntity<Map<String, Object>> handleSelfReportingException(
+    public ResponseEntity<ErrorResponse> handleSelfReportingException(
             SelfReportingException ex, WebRequest request
             ){
-        Map<String, Object> response = new HashMap<>();
-        response.put("timestamp", OffsetDateTime.now());
-        response.put("status", HttpStatus.BAD_REQUEST.value());
-        response.put("error", "Bad Request");
-        response.put("message", ex.getMessage());
-        response.put("path", request.getDescription(false).replace("uri=", ""));
+        ErrorResponse response = new ErrorResponse(
+                HttpStatus.BAD_REQUEST.value(),
+                HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                ex.getMessage(),
+                this.getPath(request),
+                null
+        );
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
     @ExceptionHandler(EntityNotFoundException.class)
-    public ResponseEntity<Map<String, Object>> handleEntityNotFoundException(
+    public ResponseEntity<ErrorResponse> handleEntityNotFoundException(
             EntityNotFoundException ex, WebRequest request
     ){
-        Map<String, Object> response = new HashMap<>();
-        response.put("timestamp", OffsetDateTime.now());
-        response.put("status", HttpStatus.NOT_FOUND.value());
-        response.put("error", HttpStatus.NOT_FOUND.getReasonPhrase());
-        response.put("message", ex.getMessage());
-        response.put("path", request.getDescription(false).replace("uri=", ""));
+        ErrorResponse response = new ErrorResponse(
+                HttpStatus.NOT_FOUND.value(),
+                HttpStatus.NOT_FOUND.getReasonPhrase(),
+                ex.getMessage(),
+                this.getPath(request),
+                null
+        );
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
     }
 
     @ExceptionHandler(ForbiddenActionException.class)
-    public ResponseEntity<Map<String, Object>> handleForbiddenActionException(
+    public ResponseEntity<ErrorResponse> handleForbiddenActionException(
             ForbiddenActionException ex, WebRequest request
     ){
-        Map<String, Object> response = new HashMap<>();
-        response.put("timestamp", OffsetDateTime.now());
-        response.put("status", HttpStatus.FORBIDDEN.value());
-        response.put("error", HttpStatus.FORBIDDEN.getReasonPhrase());
-        response.put("message", ex.getMessage());
-        response.put("path", request.getDescription(false).replace("uri=", ""));
+        ErrorResponse response = new ErrorResponse(
+                HttpStatus.FORBIDDEN.value(),
+                HttpStatus.FORBIDDEN.getReasonPhrase(),
+                ex.getMessage(),
+                this.getPath(request),
+                null
+        );
 
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
     }
 
     @ExceptionHandler(InvalidNullProperty.class)
-    public ResponseEntity<Map<String, Object>> handleInvalidNullProperty(
+    public ResponseEntity<ErrorResponse> handleInvalidNullProperty(
             InvalidNullProperty ex, WebRequest request
     ){
-        Map<String, Object> response = new HashMap<>();
-        response.put("timestamp", OffsetDateTime.now());
-        response.put("status", HttpStatus.BAD_REQUEST.value());
-        response.put("error", HttpStatus.BAD_REQUEST.getReasonPhrase());
-        response.put("message", ex.getMessage());
-        response.put("path", request.getDescription(false).replace("uri=", ""));
+        ErrorResponse response = new ErrorResponse(
+                HttpStatus.BAD_REQUEST.value(),
+                HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                ex.getMessage(),
+                this.getPath(request),
+                null
+        );
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
