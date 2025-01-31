@@ -35,6 +35,9 @@ dependencies {
     // https://mvnrepository.com/artifact/com.cloudinary/cloudinary-http44
     implementation 'com.cloudinary:cloudinary-http44:1.39.0'
 
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+
+
 
     // -- Runtime with jvm
     runtimeOnly 'com.h2database:h2'
