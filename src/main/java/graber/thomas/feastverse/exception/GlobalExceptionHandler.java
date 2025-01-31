@@ -186,4 +186,19 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
+    @ExceptionHandler(ResourceAlreadyExist.class)
+    public ResponseEntity<ErrorResponse> handleResourceAlreadyExist(
+            ResourceAlreadyExist ex, WebRequest request
+    ){
+        ErrorResponse response = new ErrorResponse(
+                HttpStatus.CONFLICT.value(),
+                HttpStatus.CONFLICT.getReasonPhrase(),
+                "Resource '" + ex.getMessage() + "' already exists.",
+                this.getPath(request),
+                null
+        );
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+    }
+
 }
