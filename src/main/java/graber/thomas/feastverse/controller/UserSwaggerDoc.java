@@ -16,6 +16,42 @@ import java.lang.annotation.Target;
 
 
 public class UserSwaggerDoc {
+
+    static final String ADMIN_USER_VIEW_EXAMPLE = """
+            {
+              "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+              "firstName": "John",
+              "lastName": "Doe",
+              "email": "jdoe@example.com",
+              "pseudo": "johnnyD",
+              "roles": [
+                "ROLE_STANDARD",
+                "ROLE_ADMINISTRATOR"
+              ],
+              "createdDate": "2025-01-28",
+              "updatedDate": "2027-01-28"
+            }
+            """;
+
+    static final String PUBLIC_USER_VIEW_EXAMPLE = """
+            {
+                "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                "pseudo": "johnnyD",
+                "createdDate": "2025-01-28"
+            }
+            """;
+
+    static final String SELF_USER_VIEW_EXAMPLE = """
+            {
+                "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                "firstName": "John",
+                "lastName": "Doe",
+                "email": "jdoe@example.com",
+                "pseudo": "johnnyD",
+                "createdDate": "2025-01-28"
+            }
+            """;
+
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.RUNTIME)
     @Operation(
@@ -35,44 +71,19 @@ public class UserSwaggerDoc {
                                     ),
                                     examples = {
                                             @ExampleObject(
-                                                    name = "Standard response.",
-                                                    value = """
-                                                            {
-                                                                 "id": "5fa77e3f-1a83-437e-8252-8f44b5ab61a0",
-                                                                 "pseudo": "aPseudo",
-                                                                 "createdDate": "2025-01-27"
-                                                            }
-                                                            """
+                                                    name = "Standard view",
+                                                    value = UserSwaggerDoc.PUBLIC_USER_VIEW_EXAMPLE,
+                                                    description = "User view returned if user is not administrator and the requested user is not itself."
                                             ),
                                             @ExampleObject(
-                                                    name = "Administrator response.",
-                                                    value = """
-                                                            {
-                                                                    "id": "5fa77e3f-1a83-437e-8252-8f44b5ab61a0",
-                                                                    "firstName": "Jean",
-                                                                    "lastName": "Dupont",
-                                                                    "email": "jdupont@test.com",
-                                                                    "pseudo": "aPseudo",
-                                                                    "roles": [
-                                                                        "STANDARD"
-                                                                    ],
-                                                                    "createdDate": "2025-01-27",
-                                                                    "updatedDate": "2025-01-27"
-                                                            }
-                                                            """
+                                                    name = "Self view",
+                                                    value = UserSwaggerDoc.SELF_USER_VIEW_EXAMPLE,
+                                                    description = "User view returned if user is not administrator and the requested user is itself."
                                             ),
                                             @ExampleObject(
-                                                    name = "Self request response.",
-                                                    value = """
-                                                            {
-                                                                "id": "9f197eb0-fa60-4363-84ac-0065aab8b119",
-                                                                "firstName": "Jean",
-                                                                "lastName": "Dupont",
-                                                                "email": "jdupont@test.com",
-                                                                "pseudo": "aPseudo",
-                                                                "createdDate": "2025-01-27"
-                                                            }
-                                                            """
+                                                    name = "Admin view",
+                                                    value = UserSwaggerDoc.ADMIN_USER_VIEW_EXAMPLE,
+                                                    description = "User view returned if user is administrator."
                                             )
                                     }
                             )
