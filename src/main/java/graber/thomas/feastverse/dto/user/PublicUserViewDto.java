@@ -1,5 +1,7 @@
 package graber.thomas.feastverse.dto.user;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import java.time.LocalDate;
 import java.util.UUID;
 
@@ -13,8 +15,10 @@ import java.util.UUID;
  * - Provides getter and setter methods for interaction with these attributes.
  * - Facilitates transformation of user objects into a form suitable for public-facing interfaces.
  */
+@Schema(name = "PublicUserView", description = "Public user data with minimal details")
 public class PublicUserViewDto implements UserView {
     private UUID id;
+
     private String pseudo;
 
     private LocalDate createdDate;

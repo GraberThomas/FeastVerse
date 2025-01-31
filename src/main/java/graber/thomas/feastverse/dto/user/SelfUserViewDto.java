@@ -1,5 +1,7 @@
 package graber.thomas.feastverse.dto.user;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import java.time.LocalDate;
 import java.util.UUID;
 
@@ -13,6 +15,7 @@ import java.util.UUID;
  * - Including administrative-specific details like roles and timestamps for record creation and updates.
  * - Providing getter and setter methods for accessing and modifying user details.
  */
+@Schema(name = "SelfUserView", description = "Personal user data including private details")
 public class SelfUserViewDto implements UserView {
     private UUID id;
     private String firstName;
