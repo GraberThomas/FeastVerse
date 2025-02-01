@@ -10,4 +10,6 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 public interface IngredientRepository extends JpaRepository<Ingredient, Long>, JpaSpecificationExecutor<Ingredient> {
     Page<Ingredient> findAllByPublicTrue(Specification<Ingredient> spec, Pageable pageable);
+
+    Ingredient findByName(String name);
 }
