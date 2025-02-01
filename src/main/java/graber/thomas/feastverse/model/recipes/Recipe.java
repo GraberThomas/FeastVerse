@@ -10,6 +10,7 @@ import org.hibernate.validator.constraints.Length;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "recipes")
@@ -29,8 +30,22 @@ public class Recipe extends Commentable {
 
     private Integer servings_size;
 
+    private RecipeDifficulty difficulty;
+
+    @ManyToOne
+    @JoinColumn(name = "type_id")
+    private RecipeType type;
+
     @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<RecipeIngredient> recipeIngredients = new ArrayList<>();
+
+    @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<RecipeStep> recipe_steps = new ArrayList<>();
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    private Set<String> tags;
+
+    private String author_note;
 
     private String image_file_name;
 
@@ -49,36 +64,16 @@ public class Recipe extends Commentable {
     private LocalDate createdDate;
 
     private LocalDate updatedDate;
-    
-    public Recipe() {}
 
-    public Recipe(
-            String title,
-            String description,
-            Integer preparation_time,
-            Integer cooking_time,
-            Integer servings_size,
-            List<RecipeIngredient> recipeIngredients,
-            String image_file_name,
-            User owner,
-            boolean isPublic,
-            boolean isDeleted,
-            String language,
-            LocalDate createdDate
-    ) {
-        this.title = title;
-        this.description = description;
-        this.preparation_time = preparation_time;
-        this.cooking_time = cooking_time;
-        this.servings_size = servings_size;
-        this.recipeIngredients = recipeIngredients;
-        this.image_file_name = image_file_name;
-        this.owner = owner;
-        this.isPublic = isPublic;
-        this.isDeleted = isDeleted;
-        this.language = language;
-        this.createdDate = createdDate;
+    public RecipeType getType() {
+        return type;
     }
+
+    public void setType(RecipeType type) {
+        this.type = type;
+    }
+
+    public Recipe() {}
 
     public String getTitle() {
         return title;
@@ -182,5 +177,37 @@ public class Recipe extends Commentable {
 
     public void setUpdatedDate(LocalDate updatedDate) {
         this.updatedDate = updatedDate;
+    }
+
+    public RecipeDifficulty getDifficulty() {
+        return difficulty;
+    }
+
+    public void setDifficulty(RecipeDifficulty difficulty) {
+        this.difficulty = difficulty;
+    }
+
+    public List<RecipeStep> getRecipe_steps() {
+        return recipe_steps;
+    }
+
+    public void setRecipe_steps(List<RecipeStep> recipe_steps) {
+        this.recipe_steps = recipe_steps;
+    }
+
+    public String getAuthor_note() {
+        return author_note;
+    }
+
+    public void setAuthor_note(String author_note) {
+        this.author_note = author_note;
+    }
+
+    public Set<String> getTags() {
+        return tags;
+    }
+
+    public void setTags(Set<String> tags) {
+        this.tags = tags;
     }
 }

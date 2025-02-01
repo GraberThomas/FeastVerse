@@ -1,11 +1,8 @@
 package graber.thomas.feastverse.model.recipes;
 
 import graber.thomas.feastverse.model.comment.Commentable;
-import jakarta.persistence.DiscriminatorValue;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import org.hibernate.validator.constraints.Length;
 
 @Entity
@@ -18,8 +15,13 @@ public class RecipeStep extends Commentable {
     @Length(max = 5000)
     private String step_description;
 
+    @ManyToOne
+    @JoinColumn(name = "recipe_id", nullable = false)
+    private Recipe recipe;
+
     public RecipeStep() {}
-    public RecipeStep(int step_number, String step_description) {
+    public RecipeStep(Recipe recipe, int step_number, String step_description) {
+        this.recipe = recipe;
         this.step_number = step_number;
         this.step_description = step_description;
     }

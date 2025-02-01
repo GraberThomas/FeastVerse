@@ -8,4 +8,5 @@ import java.util.UUID;
 
 public interface RecipeTypeRepository extends JpaRepository<RecipeType, UUID> {
     List<RecipeType> findAllByNameContains(String name);
+    RecipeType findByName(String name);
 }

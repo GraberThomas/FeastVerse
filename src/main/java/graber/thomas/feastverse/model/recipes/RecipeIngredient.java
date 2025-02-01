@@ -22,18 +22,34 @@ public class RecipeIngredient {
     @JoinColumn(name = "ingredient_id", nullable = false)
     private Ingredient ingredient;
 
-    @Column(nullable = false)
-    private double quantity;
+    private Double quantity;
+
+    private boolean required;
 
     @Column(nullable = false)
-    private QuantityType quantityType;
+    private QuantityType quantity_type;
+
+    private QuantityState ingredient_state;
+
+    private String note;
 
     public RecipeIngredient() {}
-    public RecipeIngredient(Recipe recipe, Ingredient ingredient, double quantity, QuantityType quantityType) {
+    public RecipeIngredient(Recipe recipe, Ingredient ingredient, Double quantity, QuantityType quantity_type, QuantityState ingredient_state) {
         this.recipe = recipe;
         this.ingredient = ingredient;
         this.quantity = quantity;
-        this.quantityType = quantityType;
+        this.quantity_type = quantity_type;
+        this.ingredient_state = ingredient_state;
+        this.required = false;
+    }
+
+    public RecipeIngredient(Recipe recipe, Ingredient ingredient, Double quantity, QuantityType quantity_type, QuantityState ingredient_state, boolean required) {
+        this.recipe = recipe;
+        this.ingredient = ingredient;
+        this.quantity = quantity;
+        this.quantity_type = quantity_type;
+        this.ingredient_state = ingredient_state;
+        this.required = required;
     }
 
     public UUID getId() {
@@ -68,11 +84,40 @@ public class RecipeIngredient {
         this.quantity = quantity;
     }
 
-    public QuantityType getQuantityType() {
-        return quantityType;
+    public QuantityType getQuantity_type() {
+        return quantity_type;
     }
 
-    public void setQuantityType(QuantityType quantityType) {
-        this.quantityType = quantityType;
+    public void setQuantity_type(QuantityType quantityType) {
+        this.quantity_type = quantityType;
     }
+
+    public QuantityState getIngredient_state() {
+        return ingredient_state;
+    }
+
+    public void setIngredient_state(QuantityState ingredient_state) {
+        this.ingredient_state = ingredient_state;
+    }
+
+    public String getNote() {
+        return note;
+    }
+
+    public void setNote(String note) {
+        this.note = note;
+    }
+
+    public boolean isRequired() {
+        return required;
+    }
+
+    public void setRequired(boolean required) {
+        this.required = required;
+    }
+
+    public void setQuantity(Double quantity) {
+        this.quantity = quantity;
+    }
+
 }
