@@ -128,7 +128,7 @@ public class RecipeServiceImpl implements RecipeService {
             RecipeDifficulty difficulty,
             RecipeDifficulty maxDifficulty,
             UUID type,
-            List<UUID> withIngredient,
+            List<Long> withIngredient,
             List<Long> withIngredientType,
             List<Long> withoutIngredientType,
             List<String> withTags,

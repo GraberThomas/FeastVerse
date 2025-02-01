@@ -75,7 +75,7 @@ public class RecipeSpecification {
         };
     }
 
-    public static Specification<Recipe> hasIngredient(List<UUID> ingredientIds) {
+    public static Specification<Recipe> hasIngredient(List<Long> ingredientIds) {
         return (root, query, cb) -> {
             if (ingredientIds == null || ingredientIds.isEmpty()) {
                 return cb.conjunction();
@@ -179,7 +179,7 @@ public class RecipeSpecification {
             RecipeDifficulty difficulty,
             RecipeDifficulty maxDifficulty,
             UUID type,
-            List<UUID> withIngredient,
+            List<Long> withIngredient,
             List<Long> withIngredientType,
             List<Long> withoutIngredientType,
             List<String> withTags,

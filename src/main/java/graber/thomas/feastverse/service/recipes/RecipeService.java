@@ -27,5 +27,5 @@ public interface RecipeService {
     //Recipes
     Optional<Recipe> getRecipeById(UUID id);
 
-    Page<Recipe> findAllRecipes(String name, Integer maxTotalTime, Integer servingSize, RecipeDifficulty difficulty, RecipeDifficulty maxDifficulty, UUID type, List<UUID> withIngredient, List<Long> withIngredientType, List<Long> withoutIngredientType, List<String> withTags, UUID ownerId, VisibilityFilter visibility, DeletedFilter deletedStatus, Pageable pageable);
+    Page<Recipe> findAllRecipes(String name, Integer maxTotalTime, Integer servingSize, RecipeDifficulty difficulty, RecipeDifficulty maxDifficulty, UUID type, List<Long> withIngredient, List<Long> withIngredientType, List<Long> withoutIngredientType, List<String> withTags, UUID ownerId, VisibilityFilter visibility, DeletedFilter deletedStatus, Pageable pageable);
 }
