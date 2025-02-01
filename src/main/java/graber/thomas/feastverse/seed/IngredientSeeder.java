@@ -225,6 +225,10 @@ public class IngredientSeeder implements CommandLineRunner {
                 ingredient.setName(title);
                 ingredient.setDescription(description);
                 ingredient.setImage_file_name(imageUrl);
+                ingredient.setOwner(null);
+                ingredient.setPublic(true);
+                ingredient.setCreatedDate(LocalDate.now());
+                ingredient.setDeleted(false);
 
                 switch (category) {
                     case "boissons":
@@ -258,6 +262,7 @@ public class IngredientSeeder implements CommandLineRunner {
                         ingredient.setType(AUTRES);
                         break;
                 }
+                ingredients.add(ingredient);
             }
         } catch (IOException e) {
             logger.error(e.getMessage());
@@ -266,7 +271,7 @@ public class IngredientSeeder implements CommandLineRunner {
         return ingredients;
     }
 
-        @Override
+    @Override
     public void run(String... args) {
         seedIngredientType();
         seedIngredientNew();
