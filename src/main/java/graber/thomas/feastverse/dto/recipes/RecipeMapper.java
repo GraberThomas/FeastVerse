@@ -10,12 +10,20 @@ import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface RecipeMapper {
+
+    // Mapper pour les utilisateurs normaux
     @Mapping(target = "type_name", source = "type.name")
     @Mapping(target = "owner_id", source = "owner.id")
-    @Mapping(target = "id", source = "id")
-    RecipeViewDto toRecipeViewDto(Recipe recipe);
+    RecipeUserViewDto toRecipeUserViewDto(Recipe recipe);
 
-    List<RecipeViewDto> toRecipeViewDtoList(List<Recipe> recipes);
+    // Mapper pour les administrateurs (incluant is_deleted)
+    @Mapping(target = "type_name", source = "type.name")
+    @Mapping(target = "owner_id", source = "owner.id")
+    @Mapping(target = "is_deleted", source = "deleted") // ✅ On mappe `is_deleted`
+    RecipeAdminViewDto toRecipeAdminViewDto(Recipe recipe);
+
+    List<RecipeUserViewDto> toRecipeViewDtoList(List<Recipe> recipes);
+    List<RecipeAdminViewDto> toRecipeAdminViewDtoList(List<Recipe> recipes);
 
     @Mapping(target = "ingredient_name", source = "ingredient.name")
     RecipeIngredientViewDto toRecipeIngredientViewDto(RecipeIngredient ingredient);

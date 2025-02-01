@@ -520,7 +520,7 @@ public class RecipeSeeder implements CommandLineRunner {
         recipeRepository.save(recipe10);
 
         // -----------------------------------------------------------------------
-// Recette 11 : Filet mignon de porc aux haricots et pommes de terre
+        // Recette 11 : Filet mignon de porc aux haricots et pommes de terre
         Recipe recipe11 = new Recipe();
         recipe11.setTitle("Filet mignon de porc aux haricots et pommes de terre");
         recipe11.setDescription("Recette complexe et savoureuse combinant un filet mignon de porc tendre, des haricots verts croquants et des pommes de terre fondantes, le tout relevé d'une sauce gourmande.");
@@ -565,6 +565,59 @@ public class RecipeSeeder implements CommandLineRunner {
         recipe11.setTags(Set.of("porc", "haricots", "pommes de terre", "complexe", "gourmand"));
         recipe11.setAuthor_note("Une recette complexe nécessitant une bonne gestion du temps pour obtenir une viande tendre et une sauce onctueuse.");
         recipeRepository.save(recipe11);
+
+        // -----------------------------------------------------------------------
+        // Recette 12 (PRIVÉE) : Pavé de saumon en croûte d'herbes
+        Recipe recipe12 = new Recipe();
+        recipe12.setTitle("Pavé de saumon en croûte d'herbes");
+        recipe12.setDescription("Un saumon tendre et parfumé, enrobé d'une croûte croustillante aux herbes.");
+        recipe12.setPreparation_time(15);
+        recipe12.setDifficulty(RecipeDifficulty.MEDIUM);
+        recipe12.setCooking_time(20);
+        recipe12.setServings_size(2);
+        recipe12.setImage_file_name(null);
+        recipe12.setLanguage("fr");
+        recipe12.setDeleted(false);
+        recipe12.setPublic(false);
+        recipe12.setCreatedDate(LocalDate.now().minusDays(2));
+        recipe12.setOwner(creator);
+
+        Ingredient saumon = ingredientRepository.findByName("Saumon");
+        Ingredient chapelure = ingredientRepository.findByName("Chapelure");
+        Ingredient persil = ingredientRepository.findByName("Persil");
+        Ingredient ciboulette = ingredientRepository.findByName("Ciboulette");
+        Ingredient estragon = ingredientRepository.findByName("Estragon");
+
+        RecipeIngredient paveSaumon = new RecipeIngredient(recipe12, saumon, 2.0, QuantityType.UNIT, null);
+        paveSaumon.setNote("En pavé");
+
+        List<RecipeIngredient> recipeIngredients12 = List.of(
+                paveSaumon,
+                new RecipeIngredient(recipe12, chapelure, 50.0, QuantityType.G, null),
+                new RecipeIngredient(recipe12, persil, 10.0, QuantityType.G, QuantityState.CHOPPED),
+                new RecipeIngredient(recipe12, ciboulette, 10.0, QuantityType.G, QuantityState.CHOPPED),
+                new RecipeIngredient(recipe12, estragon, 5.0, QuantityType.G, QuantityState.CHOPPED),
+                new RecipeIngredient(recipe12, citron, 1.0, QuantityType.UNIT, null),
+                new RecipeIngredient(recipe12, beurre, 30.0, QuantityType.G, null),
+                new RecipeIngredient(recipe12, sel, null, QuantityType.NONE, null),
+                new RecipeIngredient(recipe12, poivre, null, QuantityType.NONE, null)
+        );
+        recipe12.setRecipeIngredients(recipeIngredients12);
+
+        List<RecipeStep> recipeSteps12 = List.of(
+                new RecipeStep(recipe12, 1, "Préchauffez le four à 180°C."),
+                new RecipeStep(recipe12, 2, "Mélangez la chapelure avec le persil, la ciboulette et l'estragon."),
+                new RecipeStep(recipe12, 3, "Pressez le citron et incorporez-le au mélange."),
+                new RecipeStep(recipe12, 4, "Faites fondre le beurre et badigeonnez les pavés de saumon."),
+                new RecipeStep(recipe12, 5, "Recouvrez les pavés avec la préparation d'herbes et de chapelure."),
+                new RecipeStep(recipe12, 6, "Enfournez pendant 15-20 minutes jusqu'à ce que la croûte soit dorée."),
+                new RecipeStep(recipe12, 7, "Servez immédiatement avec un filet de citron supplémentaire.")
+        );
+        recipe12.setRecipe_steps(recipeSteps12);
+        recipe12.setType(main_course);
+        recipe12.setTags(Set.of("saumon", "poisson", "herbes", "four", "privé"));
+        recipe12.setAuthor_note("Idéal avec une purée de pommes de terre maison.");
+        recipeRepository.save(recipe12);
     }
 
     @Override
