@@ -26,10 +26,10 @@ public class RecipeIngredient {
     private double quantity;
 
     @Column(nullable = false)
-    private String quantityType;
+    private QuantityType quantityType;
 
     public RecipeIngredient() {}
-    public RecipeIngredient(Recipe recipe, Ingredient ingredient, double quantity, String quantityType) {
+    public RecipeIngredient(Recipe recipe, Ingredient ingredient, double quantity, QuantityType quantityType) {
         this.recipe = recipe;
         this.ingredient = ingredient;
         this.quantity = quantity;
@@ -68,11 +68,11 @@ public class RecipeIngredient {
         this.quantity = quantity;
     }
 
-    public String getQuantityType() {
+    public QuantityType getQuantityType() {
         return quantityType;
     }
 
-    public void setQuantityType(String quantityType) {
+    public void setQuantityType(QuantityType quantityType) {
         this.quantityType = quantityType;
     }
 }
