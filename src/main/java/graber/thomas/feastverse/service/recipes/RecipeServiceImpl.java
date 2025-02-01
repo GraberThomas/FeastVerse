@@ -1,7 +1,9 @@
 package graber.thomas.feastverse.service.recipes;
 
 import graber.thomas.feastverse.exception.ResourceAlreadyExist;
+import graber.thomas.feastverse.model.recipes.Recipe;
 import graber.thomas.feastverse.model.recipes.RecipeType;
+import graber.thomas.feastverse.repository.recipes.RecipeRepository;
 import graber.thomas.feastverse.repository.recipes.RecipeTypeRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.slf4j.Logger;
@@ -18,9 +20,11 @@ import java.util.UUID;
 public class RecipeServiceImpl implements RecipeService {
     private final RecipeTypeRepository recipeTypeRepository;
     private static final Logger logger = LoggerFactory.getLogger(RecipeServiceImpl.class);
+    private final RecipeRepository recipeRepository;
 
-    public RecipeServiceImpl(RecipeTypeRepository recipeTypeRepository) {
+    public RecipeServiceImpl(RecipeTypeRepository recipeTypeRepository, RecipeRepository recipeRepository) {
         this.recipeTypeRepository = recipeTypeRepository;
+        this.recipeRepository = recipeRepository;
     }
 
     @Override
@@ -71,5 +75,12 @@ public class RecipeServiceImpl implements RecipeService {
     @Override
     public void deleteRecipeType(UUID id) {
         this.recipeTypeRepository.deleteById(id);
+    }
+
+    // RECIPES
+
+    @Override
+    public Optional<Recipe> getRecipeById(UUID id) {
+        return this.recipeRepository.findById(id);
     }
 }

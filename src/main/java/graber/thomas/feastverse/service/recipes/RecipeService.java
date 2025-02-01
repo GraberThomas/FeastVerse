@@ -1,5 +1,6 @@
 package graber.thomas.feastverse.service.recipes;
 
+import graber.thomas.feastverse.model.recipes.Recipe;
 import graber.thomas.feastverse.model.recipes.RecipeType;
 
 import java.util.List;
@@ -16,4 +17,7 @@ public interface RecipeService {
     Optional<RecipeType> updateRecipeType(UUID id, String name);
 
     void deleteRecipeType(UUID id);
+
+    //Recipes
+    Optional<Recipe> getRecipeById(UUID id);
 }

@@ -76,14 +76,6 @@ public class RecipeIngredient {
         this.ingredient = ingredient;
     }
 
-    public double getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(double quantity) {
-        this.quantity = quantity;
-    }
-
     public QuantityType getQuantity_type() {
         return quantity_type;
     }
@@ -120,4 +112,7 @@ public class RecipeIngredient {
         this.quantity = quantity;
     }
 
+    public Double getQuantity() {
+        return quantity;
+    }
 }
