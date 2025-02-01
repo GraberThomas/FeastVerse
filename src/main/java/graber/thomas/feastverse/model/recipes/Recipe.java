@@ -49,13 +49,12 @@ public class Recipe extends Commentable {
 
     private String image_file_name;
 
-
     @ManyToOne
     @JoinColumn(name = "owner_id")
     private User owner = null;
 
-    private boolean isPublic = false;
-    private boolean isDeleted = false;
+    private boolean is_public = false;
+    private boolean is_deleted = false;
 
     @NotNull
     private String language;
@@ -140,19 +139,19 @@ public class Recipe extends Commentable {
     }
 
     public boolean isPublic() {
-        return isPublic;
+        return is_public;
     }
 
     public void setPublic(boolean aPublic) {
-        isPublic = aPublic;
+        is_public = aPublic;
     }
 
     public boolean isDeleted() {
-        return isDeleted;
+        return is_deleted;
     }
 
     public void setDeleted(boolean deleted) {
-        isDeleted = deleted;
+        is_deleted = deleted;
     }
 
     public String getLanguage() {
