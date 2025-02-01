@@ -13,6 +13,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
@@ -87,13 +88,19 @@ public class IngredientSeeder implements CommandLineRunner {
                         "Drinks",
                         "The drink is the other central element of a breakfast, dinner or aperitif. There are non-alcoholic drinks on one side (tea, coffee, fruit juice) and alcoholic drinks on the other. Some are made from cereals like whisky and beer, others from plants like rum and gin, and some are made from fruits (wine, cider).",
                         "drinks.jpg"
+                ),
+                new IngredientType(
+                        10L,
+                        "Autres",
+                        "Unclassifiable ingredients.",
+                        null
                 )
         );
 
         ingredientTypeRepository.saveAll(ingredientsTypes);
     }
 
-    private void seedIngredient(){
+    private void seedIngredientOlds(){
         IngredientType VEGETABLES = ingredientTypeRepository.getIngredientTypeById(1L);
         IngredientType FRUITS = ingredientTypeRepository.getIngredientTypeById(2L);
         IngredientType MEAT = ingredientTypeRepository.getIngredientTypeById(3L);
@@ -123,6 +130,11 @@ public class IngredientSeeder implements CommandLineRunner {
         this.ingredientRepository.saveAll(spices_ingredients);
         this.ingredientRepository.saveAll(chocolates_ingredients);
         this.ingredientRepository.saveAll(drinks_ingredients);
+    }
+
+    private void seedIngredientNew(){
+        List<Ingredient> ingredients = parseCsvAll();
+        this.ingredientRepository.saveAll(ingredients);
     }
 
     private List<Ingredient> parseCsv(String fileName, IngredientType ingredientType) {
@@ -170,9 +182,93 @@ public class IngredientSeeder implements CommandLineRunner {
         return ingredients;
     }
 
-    @Override
+    private List<Ingredient> parseCsvAll() {
+        List<Ingredient> ingredients = new ArrayList<>();
+
+        IngredientType VEGETABLES = ingredientTypeRepository.getIngredientTypeById(1L);
+        IngredientType FRUITS = ingredientTypeRepository.getIngredientTypeById(2L);
+        IngredientType MEAT = ingredientTypeRepository.getIngredientTypeById(3L);
+        IngredientType FISH = ingredientTypeRepository.getIngredientTypeById(4L);
+        IngredientType EGGS = ingredientTypeRepository.getIngredientTypeById(5L);
+        IngredientType PASTA = ingredientTypeRepository.getIngredientTypeById(6L);
+        IngredientType SPICES = ingredientTypeRepository.getIngredientTypeById(7L);
+        IngredientType CHOCOLATES = ingredientTypeRepository.getIngredientTypeById(8L);
+        IngredientType DRINKS = ingredientTypeRepository.getIngredientTypeById(9L);
+        IngredientType AUTRES = ingredientTypeRepository.getIngredientTypeById(10L);
+
+        try {
+            // Charger le fichier depuis le dossier resources/csv
+            ClassLoader classLoader = getClass().getClassLoader();
+            InputStream inputStream = classLoader.getResourceAsStream("csv/" + "ingredients.csv");
+
+            if (inputStream == null) {
+                throw new IllegalArgumentException("Fichier introuvable : " + "ingredients.csv");
+            }
+
+            // Lire le fichier avec encodage UTF-8
+            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
+
+            // Utiliser Apache Commons CSV pour parser le contenu
+            Iterable<CSVRecord> records = CSVFormat.DEFAULT
+                    .withDelimiter(';')  // Définir ";" comme séparateur
+                    .withHeader("URL", "Titre", "Categorie", "Description", "ImageURL") // En-têtes du fichier CSV
+                    .withSkipHeaderRecord(true) // Ignorer la première ligne (les en-têtes)
+                    .parse(reader);
+
+            for (CSVRecord record : records) {
+                String title = record.get("Titre");
+                String description = record.get("Description");
+                String imageUrl = record.get("ImageURL");
+                String category = record.get("Categorie");
+
+                Ingredient ingredient = new Ingredient();
+                ingredient.setName(title);
+                ingredient.setDescription(description);
+                ingredient.setImage_file_name(imageUrl);
+
+                switch (category) {
+                    case "boissons":
+                        ingredient.setType(DRINKS);
+                        break;
+                    case "chocolats et produits sucrés":
+                        ingredient.setType(CHOCOLATES);
+                        break;
+                    case "épices, huiles et condiments":
+                        ingredient.setType(SPICES);
+                        break;
+                    case "légumes":
+                        ingredient.setType(VEGETABLES);
+                        break;
+                    case "fruits":
+                        ingredient.setType(FRUITS);
+                        break;
+                    case "poissons et fruits de mer":
+                        ingredient.setType(FISH);
+                        break;
+                    case "pâtes, riz, graines, céréales et pains":
+                        ingredient.setType(PASTA);
+                        break;
+                    case "viandes, volailles et charcuteries":
+                        ingredient.setType(MEAT);
+                        break;
+                    case "œufs, fromages et produits laitiers":
+                        ingredient.setType(EGGS);
+                        break;
+                    case "autres":
+                        ingredient.setType(AUTRES);
+                        break;
+                }
+            }
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+        }
+
+        return ingredients;
+    }
+
+        @Override
     public void run(String... args) {
         seedIngredientType();
-        seedIngredient();
+        seedIngredientNew();
     }
 }
