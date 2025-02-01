@@ -1,17 +1,25 @@
 package graber.thomas.feastverse.service.recipes;
 
+import graber.thomas.feastverse.dto.recipes.RecipeViewDto;
 import graber.thomas.feastverse.exception.ForbiddenActionException;
 import graber.thomas.feastverse.exception.ResourceAlreadyExist;
 import graber.thomas.feastverse.model.recipes.Recipe;
+import graber.thomas.feastverse.model.recipes.RecipeDifficulty;
 import graber.thomas.feastverse.model.recipes.RecipeType;
 import graber.thomas.feastverse.model.user.UserType;
 import graber.thomas.feastverse.repository.recipes.RecipeRepository;
+import graber.thomas.feastverse.repository.recipes.RecipeSpecification;
 import graber.thomas.feastverse.repository.recipes.RecipeTypeRepository;
 import graber.thomas.feastverse.service.security.SecurityService;
+import graber.thomas.feastverse.utils.DeletedFilter;
+import graber.thomas.feastverse.utils.VisibilityFilter;
 import jakarta.persistence.EntityNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import javax.naming.NameAlreadyBoundException;
@@ -110,5 +118,49 @@ public class RecipeServiceImpl implements RecipeService {
 
         return Optional.of(recipe);
 
+    }
+
+    @Override
+    public Page<Recipe> findAllRecipes(
+            String name,
+            Integer maxTotalTime,
+            Integer servingSize,
+            RecipeDifficulty difficulty,
+            RecipeDifficulty maxDifficulty,
+            UUID type,
+            List<UUID> withIngredient,
+            List<Long> withIngredientType,
+            List<Long> withoutIngredientType,
+            List<String> withTags,
+            UUID ownerId,
+            VisibilityFilter visibility,
+            DeletedFilter deletedStatus,
+            Pageable pageable) {
+        logger.info("Receive GET All Recipes with filters: Name={}, Max Total Time={}, Serving Size={}, Difficulty={}, Max Difficulty={}, Type Id={}, With Ingredient={}, With Ingredient Type={}, Without Ingredient Type={}, With Tags={}, Owner Id={}, Visibility={}, Deleted Status={}",
+                name, maxTotalTime, servingSize, difficulty, maxDifficulty, type, withIngredient, withIngredientType, withoutIngredientType, withTags, ownerId, visibility, deletedStatus);
+
+        if(!securityService.hasRole(UserType.ADMINISTRATOR)){
+            if(visibility != VisibilityFilter.PUBLIC || deletedStatus != DeletedFilter.NOT_DELETED){
+                throw new ForbiddenActionException("Only administrators can filter by visibility or deleted status.");
+            }
+        }
+
+        Specification<Recipe> spec = RecipeSpecification.buildSpecification(
+                name,
+                maxTotalTime,
+                servingSize,
+                difficulty,
+                maxDifficulty,
+                type,
+                withIngredient,
+                withIngredientType,
+                withoutIngredientType,
+                withTags,
+                ownerId,
+                visibility,
+                deletedStatus
+        );
+
+        return this.recipeRepository.findAll(spec, pageable);
     }
 }
