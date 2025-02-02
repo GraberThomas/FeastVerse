@@ -75,6 +75,7 @@ public class UserController {
         }
     }
 
+    @UserSwaggerDoc.UserGetAllSwaggerDoc
     @GetMapping
     public Page<UserView> getAllUsers(
             @RequestParam(required = false) String role,
@@ -110,6 +111,7 @@ public class UserController {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
+    @UserSwaggerDoc.UserLikedRecipeSwaggerDoc
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/me/recipes/likes")
     public Page<RecipeViewDto> getAllLikedRecipes(Pageable pageable){
@@ -124,6 +126,7 @@ public class UserController {
     }
 
 
+    @UserSwaggerDoc.UserUpdateSwaggerDoc
     @PreAuthorize("hasRole('ROLE_ADMINISTRATOR') or #userId == authentication.principal.id")
     @PatchMapping("/{userId}")
     public UserView updateUser(@PathVariable UUID userId, @Valid @RequestBody UpdateDto updateDto) {
@@ -147,6 +150,7 @@ public class UserController {
         }
     }
 
+    @UserSwaggerDoc.UserReportSwaggerDoc
     @PreAuthorize("hasAnyRole('ROLE_ADMINISTRATOR', 'ROLE_MODERATOR')")
     @GetMapping("/{userId}/reports")
     public Page<ReportViewDTO> getReportsForUser(@PathVariable UUID userId, Pageable pageable) {
@@ -154,6 +158,7 @@ public class UserController {
     }
 
 
+    @UserSwaggerDoc.UserDeleteSwaggerDoc
     @PreAuthorize("hasRole('ROLE_ADMINISTRATOR')")
     @DeleteMapping("/{userId}")
     public ResponseEntity<Void> deleteUser(@PathVariable UUID userId) {

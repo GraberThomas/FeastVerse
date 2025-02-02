@@ -40,4 +40,14 @@ public class ApiErrorDoc {
                 "path": "/api/v1/url/of/resource"
             }
             """;
+
+    public static final String API_409_EXAMPLE = """
+            {
+                 "timestamp": "2025-02-02T09:16:58.066845903+01:00",
+                 "status": 409,
+                 "error": "Conflict",
+                 "message": "pseudo already used.",
+                 "path": "/api/v1/url/of/resource"
+            }
+            """;
 }
