@@ -145,7 +145,7 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     public void delete(UUID id) {
-
+        reportRepository.deleteById(id);
     }
 
     @Override

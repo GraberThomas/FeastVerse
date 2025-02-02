@@ -1,5 +1,6 @@
 package graber.thomas.feastverse.controller;
 
+import graber.thomas.feastverse.controller.documentation.ReportSwaggerDoc;
 import graber.thomas.feastverse.dto.reports.ReportCreateDto;
 import graber.thomas.feastverse.dto.reports.ReportUpdateDto;
 import graber.thomas.feastverse.dto.reports.ReportViewDTO;
@@ -46,6 +47,7 @@ public class ReportController {
     }
 
 
+    @ReportSwaggerDoc.ReportGetAllSwaggerDoc
     @PreAuthorize("hasAnyRole('ROLE_MODERATOR', 'ROLE_ADMINISTRATOR')")
     @GetMapping
     public Page<ReportViewDTO> getAll(
@@ -60,6 +62,7 @@ public class ReportController {
         return reportService.getAll(resolved, type, targetId, reporter, pageable).map(reportMapper::toReportView);
     }
 
+    @ReportSwaggerDoc.ReportGetByIdSwaggerDoc
     @PreAuthorize("hasAnyRole('ROLE_MODERATOR', 'ROLE_ADMINISTRATOR')")
     @GetMapping("/{reportId}")
     public ReportViewDTO getById(@PathVariable UUID reportId) {
@@ -69,12 +72,13 @@ public class ReportController {
         );
     }
 
-
+    @ReportSwaggerDoc.ReportGetTypesSwaggerDoc
     @GetMapping("/types")
     public List<ReportType> getReportTypes() {
         return reportService.getReportTypes();
     }
 
+    @ReportSwaggerDoc.ReportCreateSwaggerDoc
     @PreAuthorize("hasRole('ROLE_STANDARD')")
     @PostMapping
     public ResponseEntity<Void> createReport(@Valid @RequestBody ReportCreateDto reportCreateDto) {
