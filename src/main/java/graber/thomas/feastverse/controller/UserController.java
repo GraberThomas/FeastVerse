@@ -102,6 +102,7 @@ public class UserController {
         );
     }
 
+    @UserSwaggerDoc.UserMeSwaggerDoc
     @GetMapping("/me")
     @PreAuthorize("isAuthenticated()")
     public UserView getSelf() {
