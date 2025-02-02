@@ -11,7 +11,6 @@ import graber.thomas.feastverse.service.comment.CommentService;
 import graber.thomas.feastverse.service.security.SecurityService;
 import graber.thomas.feastverse.utils.DeletedFilter;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;

@@ -4,6 +4,7 @@ import graber.thomas.feastverse.model.OwnableEntity;
 import graber.thomas.feastverse.model.user.User;
 import jakarta.persistence.*;
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.Formula;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -25,6 +26,9 @@ public class Comment extends OwnableEntity {
     @ManyToOne
     @JoinColumn(name = "parent_id", nullable = false)
     private Commentable parent;
+
+    @Formula("(select count(r.id) from reports r where r.reportable_id = id)")
+    private int reportCount;
 
     public Comment() {
         this.createdAt = LocalDateTime.now();

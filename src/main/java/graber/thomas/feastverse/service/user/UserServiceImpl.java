@@ -127,7 +127,7 @@ public class UserServiceImpl implements UserService {
         final boolean isAdmin = securityService.hasRole(UserType.ADMINISTRATOR);
 
         if(!isAdmin && updateDto.roles() != null){
-            throw new AccessDeniedException("Only administrators can update roles.");
+            throw new ForbiddenActionException("Only administrators can update roles.");
         }
 
         if(updateDto.firstName() != null){

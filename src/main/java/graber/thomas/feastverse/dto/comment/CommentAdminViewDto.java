@@ -13,5 +13,6 @@ public record CommentAdminViewDto(
         UUID owner_id,
         UUID parent_id,
         String parent_type,
-        boolean is_deleted
+        boolean is_deleted,
+        int reportCount
 ) implements CommentViewDto {}
