@@ -12,6 +12,7 @@ import graber.thomas.feastverse.model.user.User;
 import graber.thomas.feastverse.model.user.UserType;
 import graber.thomas.feastverse.repository.report.ReportRepository;
 import graber.thomas.feastverse.repository.report.ReportSpecifications;
+import graber.thomas.feastverse.repository.report.ReportableRepository;
 import graber.thomas.feastverse.service.security.SecurityService;
 import graber.thomas.feastverse.service.user.UserService;
 import jakarta.persistence.EntityNotFoundException;
@@ -35,11 +36,13 @@ public class ReportServiceImpl implements ReportService {
     private final UserService userService;
 
     private static final Logger logger = LoggerFactory.getLogger(ReportServiceImpl.class);
+    private final ReportableRepository reportableRepository;
 
-    public ReportServiceImpl(ReportRepository reportRepository, SecurityService securityService, UserService userService) {
+    public ReportServiceImpl(ReportRepository reportRepository, SecurityService securityService, UserService userService, ReportableRepository reportableRepository) {
         this.reportRepository = reportRepository;
         this.securityService = securityService;
         this.userService = userService;
+        this.reportableRepository = reportableRepository;
     }
 
     @Override
@@ -64,7 +67,7 @@ public class ReportServiceImpl implements ReportService {
                 new EntityNotFoundException("Reporter not found for ID: " + reporterId)
         );
 
-        Reportable target = userService.getById(dto.targetId()).orElseThrow(() ->
+        Reportable target = this.getReportable(dto.targetId()).orElseThrow(() ->
                 new EntityNotFoundException("Target not found for ID: " + dto.targetId())
         );
         
@@ -129,7 +132,7 @@ public class ReportServiceImpl implements ReportService {
         }
 
         if (reportUpdateDto.isTargetIdProvided()) {
-            User target = userService.getById(reportUpdateDto.getTargetId()).orElseThrow(
+            Reportable target = this.getReportable(reportUpdateDto.getTargetId()).orElseThrow(
                     () -> new EntityNotFoundException("Target not found for ID: " + reportUpdateDto.getTargetId())
             );
             report.setTarget(target);
@@ -195,5 +198,10 @@ public class ReportServiceImpl implements ReportService {
     @Override
     public Report markAsUnresolved(UUID id) {
         return null;
+    }
+
+    @Override
+    public Optional<Reportable> getReportable(UUID id) {
+        return reportableRepository.findById(id);
     }
 }

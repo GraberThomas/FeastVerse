@@ -4,6 +4,7 @@ import graber.thomas.feastverse.dto.reports.ReportCreateDto;
 import graber.thomas.feastverse.dto.reports.ReportUpdateDto;
 import graber.thomas.feastverse.model.report.Report;
 import graber.thomas.feastverse.model.report.ReportType;
+import graber.thomas.feastverse.model.report.Reportable;
 import graber.thomas.feastverse.model.user.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -39,4 +40,6 @@ public interface ReportService {
     Report markAsResolved(UUID id);
 
     Report markAsUnresolved(UUID id);
+
+    Optional<Reportable> getReportable(UUID id);
 }

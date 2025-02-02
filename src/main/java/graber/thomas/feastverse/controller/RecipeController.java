@@ -5,15 +5,21 @@ import graber.thomas.feastverse.dto.comment.CommentMapper;
 import graber.thomas.feastverse.dto.comment.CommentViewDto;
 import graber.thomas.feastverse.dto.recipes.RecipeMapper;
 import graber.thomas.feastverse.dto.recipes.RecipeViewDto;
+import graber.thomas.feastverse.dto.reports.ReportCreateDto;
+import graber.thomas.feastverse.dto.reports.ReportMapper;
+import graber.thomas.feastverse.dto.reports.ReportOnTargetCreateDto;
+import graber.thomas.feastverse.dto.reports.ReportViewDTO;
 import graber.thomas.feastverse.model.comment.Comment;
 import graber.thomas.feastverse.model.comment.Commentable;
 import graber.thomas.feastverse.model.recipes.Recipe;
 import graber.thomas.feastverse.model.recipes.RecipeDifficulty;
 import graber.thomas.feastverse.model.recipes.RecipeStep;
+import graber.thomas.feastverse.model.report.Report;
 import graber.thomas.feastverse.model.user.User;
 import graber.thomas.feastverse.model.user.UserType;
 import graber.thomas.feastverse.service.comment.CommentService;
 import graber.thomas.feastverse.service.recipes.RecipeService;
+import graber.thomas.feastverse.service.report.ReportService;
 import graber.thomas.feastverse.service.security.SecurityService;
 import graber.thomas.feastverse.utils.DeletedFilter;
 import graber.thomas.feastverse.utils.VisibilityFilter;
@@ -36,6 +42,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Tag(name = "Recipes", description = "Endpoints for recipes")
@@ -49,14 +56,18 @@ public class RecipeController {
     private static final Logger logger = LoggerFactory.getLogger(RecipeController.class);
     private final CommentService commentService;
     private final CommentMapper commentMapper;
+    private final ReportService reportService;
+    private final ReportMapper reportMapper;
 
 
-    public RecipeController(RecipeService recipeService, RecipeMapper recipeMapper, SecurityService securityService, CommentService commentService, CommentMapper commentMapper) {
+    public RecipeController(RecipeService recipeService, RecipeMapper recipeMapper, SecurityService securityService, CommentService commentService, CommentMapper commentMapper, ReportService reportService, ReportMapper reportMapper) {
         this.recipeService = recipeService;
         this.recipeMapper = recipeMapper;
         this.securityService = securityService;
         this.commentService = commentService;
         this.commentMapper = commentMapper;
+        this.reportService = reportService;
+        this.reportMapper = reportMapper;
     }
 
     @GetMapping("/{recipeId}")
@@ -161,6 +172,114 @@ public class RecipeController {
 
         return getCommentViewDtos(pageable, recipeStep.getId());
     }
+
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/{recipeId}/reports")
+    public ResponseEntity<Void> reportRecipe(
+            @PathVariable UUID recipeId,
+            @Valid @RequestBody ReportOnTargetCreateDto reportOnTargetCreateDto
+    ){
+        Recipe recipe = recipeService.getRecipeById(recipeId).orElseThrow(
+                () -> new EntityNotFoundException("No recipe found for id " + recipeId + ".")
+        );
+
+        if(reportOnTargetCreateDto.targetId() != null){
+            if(!reportOnTargetCreateDto.targetId().equals(recipe.getId())){
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "Impossible to create the report. Target id mismatch with recipe id.");
+            }
+        }
+
+        ReportCreateDto reportCreateDto = new ReportCreateDto(
+                recipeId,
+                reportOnTargetCreateDto.message(),
+                reportOnTargetCreateDto.type()
+        );
+
+        Report newReport = reportService.create(reportCreateDto).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to create report.")
+        );
+
+        URI uri = ServletUriComponentsBuilder
+                .fromCurrentContextPath()
+                .path("/reports/{id}")
+                .buildAndExpand(newReport.getId())
+                .toUri();
+
+        return ResponseEntity.created(uri).build();
+    }
+
+    @PreAuthorize("hasAnyRole('ROLE_MODERATOR', 'ROLE_ADMINISTRATOR')")
+    @GetMapping("/{recipeId}/reports")
+    public Page<ReportViewDTO> getAllReportsOnRecipe(@PathVariable UUID recipeId, Pageable pageable){
+        Recipe recipe = recipeService.getRecipeById(recipeId).orElseThrow(
+                () -> new EntityNotFoundException("No recipe found for id " + recipeId + ".")
+        );
+
+        Page<Report> reports = reportService.getAll(
+                null,
+                null,
+                recipe.getId(),
+                null,
+                pageable
+        );
+
+        return reports.map(reportMapper::toReportView);
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/steps/{stepId}/reports")
+    public ResponseEntity<Void> reportRecipeStep(
+            @PathVariable UUID stepId,
+            @Valid @RequestBody ReportOnTargetCreateDto reportOnTargetCreateDto
+    ){
+        RecipeStep recipeStep = recipeService.getRecipeStepById(stepId).orElseThrow(
+                () -> new EntityNotFoundException("No recipe step found for id " + stepId + ".")
+        );
+
+        if(reportOnTargetCreateDto.targetId() != null){
+            if(!reportOnTargetCreateDto.targetId().equals(recipeStep.getId())){
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "Impossible to create the report. Target id mismatch with recipe id.");
+            }
+        }
+
+        ReportCreateDto reportCreateDto = new ReportCreateDto(
+                stepId,
+                reportOnTargetCreateDto.message(),
+                reportOnTargetCreateDto.type()
+        );
+
+        Report newReport = reportService.create(reportCreateDto).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to create report.")
+        );
+
+        URI uri = ServletUriComponentsBuilder
+                .fromCurrentContextPath()
+                .path("/reports/{id}")
+                .buildAndExpand(newReport.getId())
+                .toUri();
+
+        return ResponseEntity.created(uri).build();
+    }
+
+    @PreAuthorize("hasAnyRole('ROLE_MODERATOR', 'ROLE_ADMINISTRATOR')")
+    @GetMapping("/steps/{recipeStepId}/reports")
+    public Page<ReportViewDTO> getAllReportsOnRecipeStep(@PathVariable UUID recipeStepId, Pageable pageable){
+        RecipeStep recipeStep = recipeService.getRecipeStepById(recipeStepId).orElseThrow(
+                () -> new EntityNotFoundException("No recipe step found for id " + recipeStepId + ".")
+        );
+
+        Page<Report> reports = reportService.getAll(
+                null,
+                null,
+                recipeStep.getId(),
+                null,
+                pageable
+        );
+
+        return reports.map(reportMapper::toReportView);
+    }
+
+    // UTILS METHODS
 
     private Page<CommentViewDto> getCommentViewDtos(Pageable pageable, UUID id) {
         Page<Comment> comments = commentService.getAllComment(

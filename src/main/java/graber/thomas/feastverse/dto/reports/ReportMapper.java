@@ -1,5 +1,7 @@
 package graber.thomas.feastverse.dto.reports;
 
+import graber.thomas.feastverse.model.recipes.Recipe;
+import graber.thomas.feastverse.model.recipes.RecipeStep;
 import graber.thomas.feastverse.model.report.Report;
 import graber.thomas.feastverse.model.report.Reportable;
 import graber.thomas.feastverse.model.user.User;
@@ -20,6 +22,10 @@ public interface ReportMapper {
         }
         if (target instanceof User) {
             return "USER";
+        }else if(target instanceof Recipe){
+            return "RECIPE";
+        }else if(target instanceof RecipeStep){
+            return "RECIPE_STEP";
         }
         return "UNKNOWN";
     }
