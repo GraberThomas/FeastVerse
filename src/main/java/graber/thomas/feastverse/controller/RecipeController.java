@@ -1,5 +1,6 @@
 package graber.thomas.feastverse.controller;
 
+import graber.thomas.feastverse.controller.documentation.RecipeSwaggerDoc;
 import graber.thomas.feastverse.dto.comment.CommentCreateDto;
 import graber.thomas.feastverse.dto.comment.CommentMapper;
 import graber.thomas.feastverse.dto.comment.CommentViewDto;
@@ -79,6 +80,7 @@ public class RecipeController {
         this.likeService = likeService;
     }
 
+    @RecipeSwaggerDoc.RecipeGetByIdSwaggerDoc
     @GetMapping("/{recipeId}")
     public RecipeViewDto getRecipeById(@PathVariable UUID recipeId){
         Recipe recipe = recipeService.getRecipeById(recipeId).orElseThrow(
@@ -91,6 +93,7 @@ public class RecipeController {
         return recipeMapper.toRecipeUserViewDto(recipe);
     }
 
+    @RecipeSwaggerDoc.RecipeGetAllSwaggerDoc
     @GetMapping
     public Page<RecipeViewDto> getAllRecipes(
             @RequestParam(required = false) String name,
@@ -129,6 +132,7 @@ public class RecipeController {
         return recipes.map(recipeMapper::toRecipeListViewDto);
     }
 
+    @RecipeSwaggerDoc.RecipePostCommentSwaggerDoc
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/{recipeId}/comments")
     public ResponseEntity<Void> addCommentOnRecipe(
@@ -146,6 +150,7 @@ public class RecipeController {
         return ResponseEntity.created(location).build();
     }
 
+    @RecipeSwaggerDoc.RecipeGetAllCommentsSwaggerDoc
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/{recipeId}/comments")
     public Page<CommentViewDto> getAllCommentsOnRecipe(
@@ -160,6 +165,7 @@ public class RecipeController {
         return getCommentViewDtos(pageable, recipe.getId());
     }
 
+    @RecipeSwaggerDoc.RecipeStepPostCommentSwaggerDoc
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/steps/{recipeStepId}/comments")
     public ResponseEntity<Void> addCommentOnRecipeStep(
@@ -177,6 +183,7 @@ public class RecipeController {
         return ResponseEntity.created(location).build();
     }
 
+    @RecipeSwaggerDoc.RecipeStepGetAllCommentsSwaggerDoc
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/steps/{recipeStepId}/comments")
     public Page<CommentViewDto> getAllCommentsOnRecipeStep(
@@ -191,6 +198,7 @@ public class RecipeController {
         return getCommentViewDtos(pageable, recipeStep.getId());
     }
 
+    @RecipeSwaggerDoc.RecipePostReportSwaggerDoc
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/{recipeId}/reports")
     public ResponseEntity<Void> reportRecipe(
@@ -226,6 +234,7 @@ public class RecipeController {
         return ResponseEntity.created(uri).build();
     }
 
+    @RecipeSwaggerDoc.RecipeGetAllReportsSwaggerDoc
     @PreAuthorize("hasAnyRole('ROLE_MODERATOR', 'ROLE_ADMINISTRATOR')")
     @GetMapping("/{recipeId}/reports")
     public Page<ReportViewDTO> getAllReportsOnRecipe(
@@ -248,6 +257,7 @@ public class RecipeController {
         return reports.map(reportMapper::toReportView);
     }
 
+    @RecipeSwaggerDoc.RecipeStepPostReportSwaggerDoc
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/steps/{stepId}/reports")
     public ResponseEntity<Void> reportRecipeStep(
@@ -283,6 +293,7 @@ public class RecipeController {
         return ResponseEntity.created(uri).build();
     }
 
+    @RecipeSwaggerDoc.RecipeStepGetAllReportsSwaggerDoc
     @PreAuthorize("hasAnyRole('ROLE_MODERATOR', 'ROLE_ADMINISTRATOR')")
     @GetMapping("/steps/{recipeStepId}/reports")
     public Page<ReportViewDTO> getAllReportsOnRecipeStep(
@@ -305,6 +316,7 @@ public class RecipeController {
         return reports.map(reportMapper::toReportView);
     }
 
+    @RecipeSwaggerDoc.RecipePostLikeSwaggerDoc
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/{recipeId}/like")
     public ResponseEntity<Void> likeRecipe(@PathVariable UUID recipeId){
@@ -323,6 +335,7 @@ public class RecipeController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
+    @RecipeSwaggerDoc.RecipeDeleteLikeSwaggerDoc
     @PreAuthorize("isAuthenticated()")
     @DeleteMapping("/{recipeId}/like")
     public ResponseEntity<Void> unlikeRecipe(@PathVariable UUID recipeId){
