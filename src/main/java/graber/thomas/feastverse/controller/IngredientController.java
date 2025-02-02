@@ -13,8 +13,11 @@ import jakarta.validation.Valid;
 import org.apache.tomcat.util.http.fileupload.FileUploadException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -43,7 +46,8 @@ public class IngredientController {
     @GetMapping("/types")
     public Page<IngredientTypeViewDto> getAllTypes(
             @RequestParam(required = false) String name,
-            Pageable pageable
+            @ParameterObject
+            @PageableDefault(size = 10, sort="name", direction = Sort.Direction.ASC) Pageable pageable
     ) {
         return ingredientService.getAllTypes(name, pageable)
                 .map(IngredientTypeViewDto::fromEntity);
@@ -65,7 +69,8 @@ public class IngredientController {
             @RequestParam(required = false, defaultValue = "ALL") OwnershipFilter ownership,
             @RequestParam(required = false, defaultValue = "NOT_DELETED") DeletedFilter deletedStatus,
             @RequestParam(required = false) UUID ownerId,
-            Pageable pageable
+            @ParameterObject
+            @PageableDefault(size = 10, sort="name", direction = Sort.Direction.ASC) Pageable pageable
     ) {
         if(typeId != null && typeName != null){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You cannot filter by both typeId and typeName");

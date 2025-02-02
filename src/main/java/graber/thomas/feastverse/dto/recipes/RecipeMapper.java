@@ -12,20 +12,20 @@ import java.util.List;
 public interface RecipeMapper {
 
     @Mapping(target = "type_name", source = "type.name")
-    @Mapping(target = "like_count", expression = "java(recipe.getLikes() != null ? recipe.getLikes().size() : 0)")
+    @Mapping(target = "like_count", source = "likeCount")
     RecipeListViewDto toRecipeListViewDto(Recipe recipe);
 
     List<RecipeListViewDto> toRecipeListViewDtoList(List<Recipe> recipes);
 
     @Mapping(target = "type_name", source = "type.name")
     @Mapping(target = "owner_id", source = "owner.id")
-    @Mapping(target = "like_count", expression = "java(recipe.getLikes() != null ? recipe.getLikes().size() : 0)")
+    @Mapping(target = "like_count", source = "likeCount")
     RecipeUserViewDto toRecipeUserViewDto(Recipe recipe);
 
     @Mapping(target = "type_name", source = "type.name")
     @Mapping(target = "owner_id", source = "owner.id")
     @Mapping(target = "is_deleted", source = "deleted")
-    @Mapping(target = "like_count", expression = "java(recipe.getLikes() != null ? recipe.getLikes().size() : 0)")
+    @Mapping(target = "like_count", source = "likeCount")
     RecipeAdminViewDto toRecipeAdminViewDto(Recipe recipe);
 
     List<RecipeUserViewDto> toRecipeViewDtoList(List<Recipe> recipes);

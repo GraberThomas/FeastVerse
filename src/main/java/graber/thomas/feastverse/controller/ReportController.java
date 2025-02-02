@@ -14,8 +14,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -50,7 +53,8 @@ public class ReportController {
             @RequestParam(required = false) ReportType type,
             @RequestParam(required = false) UUID targetId,
             @RequestParam(required = false) UUID reporterId,
-            Pageable pageable
+            @ParameterObject
+            @PageableDefault(size = 10, sort="type", direction = Sort.Direction.DESC) Pageable pageable
     ) {
         User reporter = reporterId != null ? userService.getById(reporterId).orElse(null) : null;
         return reportService.getAll(resolved, type, targetId, reporter, pageable).map(reportMapper::toReportView);

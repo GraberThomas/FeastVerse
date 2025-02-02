@@ -33,8 +33,11 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Size;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -103,7 +106,8 @@ public class RecipeController {
             @RequestParam(required = false) UUID ownerId,
             @RequestParam(required = false, defaultValue = "PUBLIC") VisibilityFilter visibility,
             @RequestParam(required = false, defaultValue = "NOT_DELETED") DeletedFilter deletedStatus,
-            Pageable pageable
+            @ParameterObject
+            @PageableDefault(size = 10, sort = "likeCount", direction = Sort.Direction.DESC) Pageable pageable
     ){
         Page<Recipe> recipes = this.recipeService.findAllRecipes(
                 name,
@@ -144,7 +148,11 @@ public class RecipeController {
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/{recipeId}/comments")
-    public Page<CommentViewDto> getAllCommentsOnRecipe(@PathVariable UUID recipeId, Pageable pageable){
+    public Page<CommentViewDto> getAllCommentsOnRecipe(
+            @PathVariable UUID recipeId,
+            @ParameterObject
+            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
+    ){
         Recipe recipe = recipeService.getRecipeById(recipeId).orElseThrow(
                 () -> new EntityNotFoundException("No recipe found for id " + recipeId + ".")
         );
@@ -171,7 +179,11 @@ public class RecipeController {
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/steps/{recipeStepId}/comments")
-    public Page<CommentViewDto> getAllCommentsOnRecipeStep(@PathVariable UUID recipeStepId, Pageable pageable){
+    public Page<CommentViewDto> getAllCommentsOnRecipeStep(
+            @PathVariable UUID recipeStepId,
+            @ParameterObject
+            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
+    ){
         RecipeStep recipeStep = recipeService.getRecipeStepById(recipeStepId).orElseThrow(
                 () -> new EntityNotFoundException("No recipe step found for id " + recipeStepId + ".")
         );
@@ -216,7 +228,11 @@ public class RecipeController {
 
     @PreAuthorize("hasAnyRole('ROLE_MODERATOR', 'ROLE_ADMINISTRATOR')")
     @GetMapping("/{recipeId}/reports")
-    public Page<ReportViewDTO> getAllReportsOnRecipe(@PathVariable UUID recipeId, Pageable pageable){
+    public Page<ReportViewDTO> getAllReportsOnRecipe(
+            @PathVariable UUID recipeId,
+            @ParameterObject
+            @PageableDefault(size = 10, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable
+    ){
         Recipe recipe = recipeService.getRecipeById(recipeId).orElseThrow(
                 () -> new EntityNotFoundException("No recipe found for id " + recipeId + ".")
         );
@@ -269,7 +285,11 @@ public class RecipeController {
 
     @PreAuthorize("hasAnyRole('ROLE_MODERATOR', 'ROLE_ADMINISTRATOR')")
     @GetMapping("/steps/{recipeStepId}/reports")
-    public Page<ReportViewDTO> getAllReportsOnRecipeStep(@PathVariable UUID recipeStepId, Pageable pageable){
+    public Page<ReportViewDTO> getAllReportsOnRecipeStep(
+            @PathVariable UUID recipeStepId,
+            @ParameterObject
+            @PageableDefault(size = 10, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable
+    ){
         RecipeStep recipeStep = recipeService.getRecipeStepById(recipeStepId).orElseThrow(
                 () -> new EntityNotFoundException("No recipe step found for id " + recipeStepId + ".")
         );

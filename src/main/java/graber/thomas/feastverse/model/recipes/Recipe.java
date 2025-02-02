@@ -6,6 +6,7 @@ import graber.thomas.feastverse.model.user.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import org.hibernate.annotations.Formula;
 import org.hibernate.validator.constraints.Length;
 
 import java.time.LocalDate;
@@ -68,6 +69,13 @@ public class Recipe extends Commentable {
 
     @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<RecipeLike> likes = new HashSet<>();
+
+    @Formula("(select count(*) from recipe_like rl where rl.recipe_id = id)")
+    private int likeCount;
+
+    public int getLikeCount() {
+        return likeCount;
+    }
 
     public RecipeType getType() {
         return type;

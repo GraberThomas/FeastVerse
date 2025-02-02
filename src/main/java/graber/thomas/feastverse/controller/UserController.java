@@ -15,8 +15,11 @@ import graber.thomas.feastverse.service.user.UserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -78,7 +81,8 @@ public class UserController {
             @RequestParam(required = false) String firstName,
             @RequestParam(required = false) String pseudo,
             @RequestParam(required = false) String email,
-            Pageable pageable
+            @ParameterObject
+            @PageableDefault(size = 10, sort = "pseudo", direction = Sort.Direction.ASC) Pageable pageable
     ) {
         boolean isAdmin = securityService.hasRole(UserType.ADMINISTRATOR);
         Page<User> users;
