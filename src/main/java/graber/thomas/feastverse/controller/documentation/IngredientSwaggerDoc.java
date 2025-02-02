@@ -629,7 +629,12 @@ public class IngredientSwaggerDoc {
     @Retention(RetentionPolicy.RUNTIME)
     @Operation(
             summary = "Create new ingredient",
-            description = "Create new ingredient. Authentication is needed. Require a multipart form value, with on requested json for data and a Multipart file for a file upload.",
+            description = "Create new ingredient. Authentication is needed. Require a multipart form value, with on requested json for data and a Multipart file for a file upload.  OpenAPI don't allow schema for multipart. Schema : String name;\\n\" +\n" +
+                    "                    \"    Long type;\\n\" +\n" +
+                    "                    \"    @Length(max = 5000)\\n\" +\n" +
+                    "                    \"    String description;\\n\" +\n" +
+                    "                    \"    Boolean isPublic;\\n\" +\n" +
+                    "                    \"    UUID ownerId;\",",
             responses = {
                     @ApiResponse(
                             responseCode = "200",
@@ -700,7 +705,12 @@ public class IngredientSwaggerDoc {
     @Retention(RetentionPolicy.RUNTIME)
     @Operation(
             summary = "Update an ingredient.",
-            description = "Perform a patch in ingredient. If a file value is set but null, old image is erased. If image is not present, old image will no be changed.",
+            description = "Perform a patch in ingredient. If a file value is set but null, old image is erased. If image is not present, old image will no be changed. OpenAPI don't allow schema for multipart. Schema : String name;\n" +
+                    "    Long type;\n" +
+                    "    @Length(max = 5000)\n" +
+                    "    String description;\n" +
+                    "    Boolean isPublic;\n" +
+                    "    UUID ownerId;",
             responses = {
                     @ApiResponse(
                             responseCode = "200",

@@ -10,6 +10,7 @@ import graber.thomas.feastverse.utils.DeletedFilter;
 import graber.thomas.feastverse.utils.OwnershipFilter;
 import graber.thomas.feastverse.utils.VisibilityFilter;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.apache.tomcat.util.http.fileupload.FileUploadException;
@@ -119,7 +120,7 @@ public class IngredientController {
     @PreAuthorize("hasRole('ROLE_STANDARD')")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public IngredientViewDto createIngredient(
-            @Parameter(description = "Json part needed to create an ingredient.")
+            @Parameter(description = "Json part needed to create an ingredient.", schema = @Schema(implementation = IngredientCreateDto.class))
             @Valid @RequestPart("ingredient") IngredientCreateDto ingredientDto,
             @Parameter(description = "Not required. Multipart file for upload an image of new ingredient.")
             @RequestPart(value = "file", required = false) MultipartFile file
