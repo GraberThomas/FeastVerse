@@ -1,5 +1,6 @@
 package graber.thomas.feastverse.controller;
 
+import graber.thomas.feastverse.controller.documentation.RecipeTypeSwaggerDoc;
 import graber.thomas.feastverse.dto.recipes.RecipeTypeCreateDto;
 import graber.thomas.feastverse.model.recipes.RecipeType;
 import graber.thomas.feastverse.service.recipes.RecipeService;
@@ -27,6 +28,7 @@ public class RecipeTypeController {
         this.recipeService = recipeService;
     }
 
+    @RecipeTypeSwaggerDoc.RecipeTypeGetALLSwaggerDoc
     @GetMapping
     public List<RecipeType> getAllRecipeType(
             @RequestParam(required = false) String name
@@ -34,6 +36,7 @@ public class RecipeTypeController {
         return this.recipeService.getAllRecipesTypes(name);
     }
 
+    @RecipeTypeSwaggerDoc.RecipeTypeGetByIdSwaggerDoc
     @GetMapping("/{typeId}")
     public RecipeType getRecipeType(@Valid @PathVariable UUID typeId){
         return this.recipeService.getRecipeType(typeId).orElseThrow(
@@ -41,6 +44,7 @@ public class RecipeTypeController {
         );
     }
 
+    @RecipeTypeSwaggerDoc.RecipeTypeCreateSwaggerDoc
     @PreAuthorize("hasRole('ROLE_ADMINISTRATOR')")
     @PostMapping
     public ResponseEntity<Void> createRecipeType(@Valid @RequestBody RecipeTypeCreateDto recipeTypeCreateDto){
@@ -57,6 +61,7 @@ public class RecipeTypeController {
         return ResponseEntity.created(location).build();
     }
 
+    @RecipeTypeSwaggerDoc.RecipeTypeUpdateSwaggerDoc
     @PreAuthorize("hasRole('ROLE_ADMINISTRATOR')")
     @PutMapping("/{typeId}")
     public RecipeType updateRecipeType(@Valid @RequestBody RecipeTypeCreateDto recipeTypeCreateDto, @PathVariable UUID typeId){
@@ -65,6 +70,7 @@ public class RecipeTypeController {
         );
     }
 
+    @RecipeTypeSwaggerDoc.RecipeTypeDeleteSwaggerDoc
     @PreAuthorize("hasRole('ROLE_ADMINISTRATOR')")
     @DeleteMapping("/{typeId}")
     public ResponseEntity<Void> deleteRecipeType(@PathVariable UUID typeId){

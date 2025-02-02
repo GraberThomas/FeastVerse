@@ -38,18 +38,7 @@ public class ReportSwaggerDoc {
             responses = {
                    @ApiResponse(
                             responseCode = "200",
-                            description = "Reports found",
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(
-                                            implementation = ReportViewDTO.class
-                                    ),
-                                    examples = {
-                                            @ExampleObject(
-                                                    value = REPORT_EXAMPLE
-                                            )
-                                    }
-                            )
+                            description = "Reports found"
                    ),
                     @ApiResponse(
                             responseCode = "400",

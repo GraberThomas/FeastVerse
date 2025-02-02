@@ -99,6 +99,7 @@ public class ReportController {
         return ResponseEntity.created(location).build();
     }
 
+    @ReportSwaggerDoc.ReportUpdateSwaggerDoc
     @PreAuthorize("hasAnyRole('ROLE_MODERATOR', 'ROLE_ADMINISTRATOR')")
     @PatchMapping("/{reportId}")
     public ReportViewDTO updateReport(@Valid @RequestBody ReportUpdateDto reportUpdateDto, @PathVariable UUID reportId) {
@@ -111,6 +112,7 @@ public class ReportController {
 
     }
 
+    @ReportSwaggerDoc.ReportDeleteSwaggerDoc
     @PreAuthorize("hasRole('ROLE_ADMINISTRATOR')")
     @DeleteMapping("/{reportId}")
     public ResponseEntity<Void> deleteReport(@PathVariable UUID reportId) {
