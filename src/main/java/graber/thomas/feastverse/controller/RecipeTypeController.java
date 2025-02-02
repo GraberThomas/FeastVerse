@@ -17,7 +17,7 @@ import java.net.URI;
 import java.util.List;
 import java.util.UUID;
 
-@Tag(name = "Recipes", description = "Endpoints for recipes")
+@Tag(name = "Recipes types", description = "Endpoints for recipes types")
 @RestController
 @RequestMapping("/recipes/types")
 public class RecipeTypeController {
