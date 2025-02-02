@@ -1,5 +1,6 @@
 package graber.thomas.feastverse.controller;
 
+import graber.thomas.feastverse.controller.documentation.IngredientSwaggerDoc;
 import graber.thomas.feastverse.dto.ingredient.*;
 import graber.thomas.feastverse.model.ingredient.Ingredient;
 import graber.thomas.feastverse.model.user.UserType;
@@ -8,6 +9,7 @@ import graber.thomas.feastverse.service.security.SecurityService;
 import graber.thomas.feastverse.utils.DeletedFilter;
 import graber.thomas.feastverse.utils.OwnershipFilter;
 import graber.thomas.feastverse.utils.VisibilityFilter;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.apache.tomcat.util.http.fileupload.FileUploadException;
@@ -28,7 +30,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.UUID;
 
-@Tag(name = "Ingredient", description = "Endpoints for ingredients")
+@Tag(name = "Ingredient", description = "Endpoints for manage ingredients.")
 @RestController
 @RequestMapping("/ingredients")
 public class IngredientController {
@@ -43,8 +45,10 @@ public class IngredientController {
         this.ingredientMapper = ingredientMapper;
     }
 
+    @IngredientSwaggerDoc.IngredientGetAllTypeSwaggerDoc
     @GetMapping("/types")
     public Page<IngredientTypeViewDto> getAllTypes(
+            @Parameter(description = "Allow to filter by name.")
             @RequestParam(required = false) String name,
             @ParameterObject
             @PageableDefault(size = 10, sort="name", direction = Sort.Direction.ASC) Pageable pageable
@@ -53,21 +57,33 @@ public class IngredientController {
                 .map(IngredientTypeViewDto::fromEntity);
     }
 
+    @IngredientSwaggerDoc.IngredientGetTypeByIdSwaggerDoc
     @GetMapping("/types/{typeId}")
-    public IngredientTypeViewDto getById(@PathVariable Long typeId) {
+    public IngredientTypeViewDto getById(
+            @Parameter(description = "The id of ingredient type.")
+            @PathVariable Long typeId
+    ) {
         return IngredientTypeViewDto.fromEntity(ingredientService.getIngredientTypeById(typeId).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ingredient type not found for id " + typeId + ".")
         ));
     }
 
+    @IngredientSwaggerDoc.IngredientGetAllIngredientsSwaggerDoc
     @GetMapping
     public Page<IngredientViewDto> getAllIngredients(
+            @Parameter(description = "Allow to filter by name.")
             @RequestParam(required = false) String name,
+            @Parameter(description = "Allow to filer by typeName. Incompatible with typeId")
             @RequestParam(required = false) String typeName,
+            @Parameter(description = "Allow to filter by typeId. Incompatible with typeName")
             @RequestParam(required = false) Long typeId,
+            @Parameter(description = "Allow to filter by visibility status. Only for ADMINISTRATOR.")
             @RequestParam(required = false, defaultValue = "PUBLIC") VisibilityFilter visibility,
+            @Parameter(description = "Allow to filter by ownership status.")
             @RequestParam(required = false, defaultValue = "ALL") OwnershipFilter ownership,
+            @Parameter(description = "Allow to filter by deleted status.Only for ADMINISTRATOR.")
             @RequestParam(required = false, defaultValue = "NOT_DELETED") DeletedFilter deletedStatus,
+            @Parameter(description = "Allow to filter by owner.")
             @RequestParam(required = false) UUID ownerId,
             @ParameterObject
             @PageableDefault(size = 10, sort="name", direction = Sort.Direction.ASC) Pageable pageable
@@ -83,8 +99,12 @@ public class IngredientController {
                 .map(ingredientMapper::toPublicViewDto);
     }
 
+    @IngredientSwaggerDoc.IngredientGetOneIngredientsSwaggerDoc
     @GetMapping("/{ingredientId}")
-    public IngredientViewDto getIngredient(@PathVariable Long ingredientId) {
+    public IngredientViewDto getIngredient(
+            @Parameter(description = "The id of ingredient.")
+            @PathVariable Long ingredientId
+    ) {
         Ingredient ingredient = ingredientService.getIngredientById(ingredientId).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ingredient not found for id " + ingredientId + ".")
         );
@@ -95,10 +115,13 @@ public class IngredientController {
         return ingredientMapper.toPublicViewDto(ingredient);
     }
 
+    @IngredientSwaggerDoc.IngredientCreateIngredientsSwaggerDoc
     @PreAuthorize("hasRole('ROLE_STANDARD')")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public IngredientViewDto createIngredient(
+            @Parameter(description = "Json part needed to create an ingredient.")
             @Valid @RequestPart("ingredient") IngredientCreateDto ingredientDto,
+            @Parameter(description = "Not required. Multipart file for upload an image of new ingredient.")
             @RequestPart(value = "file", required = false) MultipartFile file
     ) throws FileUploadException {
         Ingredient ingredient = ingredientService.createIngredient(ingredientDto, file).orElseThrow(
@@ -110,11 +133,15 @@ public class IngredientController {
         return ingredientMapper.toPublicViewDto(ingredient);
     }
 
+    @IngredientSwaggerDoc.IngredientUpdateIngredientsSwaggerDoc
     @PreAuthorize("isAuthenticated()")
     @PatchMapping(value = "/{ingredientId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public IngredientViewDto patchIngredient(
+            @Parameter(description = "The id of ingredient.")
             @PathVariable Long ingredientId,
+            @Parameter(description = "Json part needed to update an ingredient.")
             @Valid @RequestPart("ingredient") IngredientPatchDto ingredientPatchDto,
+            @Parameter(description = "Not required. Multipart file for upload an image of new ingredient.")
             @RequestPart(value = "file", required = false) MultipartFile file
     ) throws FileUploadException {
         Ingredient ingredient = ingredientService.getIngredientById(ingredientId).orElseThrow(
@@ -129,6 +156,7 @@ public class IngredientController {
         return dto;
     }
 
+    @IngredientSwaggerDoc.IngredientDeleteIngredientsSwaggerDoc
     @PreAuthorize("isAuthenticated()")
     @DeleteMapping("/{ingredientId}")
     public ResponseEntity<Void> deleteIngredient(
