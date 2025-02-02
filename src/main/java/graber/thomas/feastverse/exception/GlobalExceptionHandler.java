@@ -1,6 +1,11 @@
 package graber.thomas.feastverse.exception;
 
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
@@ -26,6 +31,54 @@ public class GlobalExceptionHandler {
 
     private String getPath(WebRequest request){
         return request.getDescription(false).replace("uri=", "");
+    }
+
+    @ApiResponse(
+            responseCode = "500",
+            description = "Un unexpected error happened.",
+            content = @Content(
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(
+                        value = """
+                                {
+                                    "timestamp": "2025-02-02T08:45:43.942215133+01:00",
+                                    "status": 500,
+                                    "error": "Internal Server Error",
+                                    "message": "You cannot divide by zero.",
+                                    "path": "/api/to/resource"
+                                }
+                                """
+                    )
+            )
+    )
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleAllExceptions(Exception ex, WebRequest request) {
+        ErrorResponse errorResponse = new ErrorResponse(
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
+                ex.getMessage(),
+                this.getPath(request),
+                null
+        );
+
+        ex.printStackTrace();
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
+    }
+
+    @ExceptionHandler(InvalidCredentialException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidCredentialException(
+            InvalidCredentialException ex, WebRequest request
+    ){
+        ex.printStackTrace();
+        ErrorResponse res = new ErrorResponse(
+                HttpStatus.UNAUTHORIZED.value(),
+                HttpStatus.UNAUTHORIZED.getReasonPhrase(),
+                ex.getMessage(),
+                this.getPath(request),
+                null
+        );
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(res);
     }
 
     @ExceptionHandler(UsernameNotFoundException.class)

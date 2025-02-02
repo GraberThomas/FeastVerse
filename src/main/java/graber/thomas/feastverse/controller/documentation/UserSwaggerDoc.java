@@ -1,4 +1,4 @@
-package graber.thomas.feastverse.controller;
+package graber.thomas.feastverse.controller.documentation;
 
 import graber.thomas.feastverse.dto.user.AdminUserViewDto;
 import graber.thomas.feastverse.dto.user.PublicUserViewDto;

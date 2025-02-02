@@ -2,6 +2,7 @@ package graber.thomas.feastverse.controller;
 
 import graber.thomas.feastverse.dto.auth.AuthenticationRequestCreateDto;
 import graber.thomas.feastverse.dto.auth.AuthenticationRequestDto;
+import graber.thomas.feastverse.exception.InvalidCredentialException;
 import graber.thomas.feastverse.exception.UserAlreadyExistsException;
 import graber.thomas.feastverse.model.user.User;
 import graber.thomas.feastverse.model.user.UserType;
@@ -67,7 +68,7 @@ public class AuthController {
                     )
             );
         } catch (Exception e) {
-            throw new RuntimeException("Incorrect username or password", e);
+            throw new InvalidCredentialException("Incorrect username or password", e);
         }
 
         final UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequestDto.username());

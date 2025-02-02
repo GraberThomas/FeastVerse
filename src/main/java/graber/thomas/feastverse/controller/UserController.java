@@ -1,5 +1,6 @@
 package graber.thomas.feastverse.controller;
 
+import graber.thomas.feastverse.controller.documentation.UserSwaggerDoc;
 import graber.thomas.feastverse.dto.recipes.RecipeMapper;
 import graber.thomas.feastverse.dto.recipes.RecipeViewDto;
 import graber.thomas.feastverse.dto.reports.ReportMapper;
