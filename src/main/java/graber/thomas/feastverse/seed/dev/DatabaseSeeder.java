@@ -43,7 +43,6 @@ import java.util.Set;
  * - PasswordEncoder: Utilized for encoding user passwords.
  */
 @Component
-@Profile("dev")
 @Order(2)
 public class DatabaseSeeder implements CommandLineRunner {
 
