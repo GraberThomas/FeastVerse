@@ -4,11 +4,14 @@ import graber.thomas.feastverse.model.comment.Comment;
 import graber.thomas.feastverse.model.comment.Commentable;
 import graber.thomas.feastverse.model.ingredient.Ingredient;
 import graber.thomas.feastverse.model.recipes.*;
+import graber.thomas.feastverse.model.report.Report;
+import graber.thomas.feastverse.model.report.ReportType;
 import graber.thomas.feastverse.model.user.User;
 import graber.thomas.feastverse.repository.ingredients.IngredientRepository;
 import graber.thomas.feastverse.repository.ingredients.IngredientTypeRepository;
 import graber.thomas.feastverse.repository.recipes.RecipeRepository;
 import graber.thomas.feastverse.repository.recipes.RecipeTypeRepository;
+import graber.thomas.feastverse.repository.report.ReportRepository;
 import graber.thomas.feastverse.repository.user.UserRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
@@ -27,13 +30,15 @@ public class RecipeSeeder implements CommandLineRunner {
     private final IngredientRepository ingredientRepository;
     private final RecipeRepository recipeRepository;
     private final IngredientTypeRepository ingredientTypeRepository;
+    private final ReportRepository reportRepository;
 
-    public RecipeSeeder(RecipeTypeRepository recipeTypeRepository, UserRepository userRepository, IngredientRepository ingredientRepository, RecipeRepository recipeRepository, IngredientTypeRepository ingredientTypeRepository) {
+    public RecipeSeeder(RecipeTypeRepository recipeTypeRepository, UserRepository userRepository, IngredientRepository ingredientRepository, RecipeRepository recipeRepository, IngredientTypeRepository ingredientTypeRepository, ReportRepository reportRepository) {
         this.recipeTypeRepository = recipeTypeRepository;
         this.userRepository = userRepository;
         this.ingredientRepository = ingredientRepository;
         this.recipeRepository = recipeRepository;
         this.ingredientTypeRepository = ingredientTypeRepository;
+        this.reportRepository = reportRepository;
     }
 
     public void seedRecipesTypes() {
@@ -173,6 +178,7 @@ public class RecipeSeeder implements CommandLineRunner {
                 )
         );
 
+
         List<RecipeIngredient> recipeIngredients1 = List.of(
                 new RecipeIngredient(recipe1, huile_olive, 2.0, QuantityType.TBSP, null),
                 new RecipeIngredient(recipe1, laitue, 2.0, QuantityType.HEART, QuantityState.CHOPPED),
@@ -204,7 +210,7 @@ public class RecipeSeeder implements CommandLineRunner {
         recipe1.setTags(Set.of("vegetarien", "salade Cesar", "entrée", "salade"));
 
         recipe1.setAuthor_note("Servir en accompagnement d'une quiche ou d'une tourte. Excellent repas du soir. Vous pouvez utiliser des croûtons déjà prêts. La sauce peut être préparée 6 heures à l'avance et réservée au frais.");
-        recipeRepository.save(recipe1);
+
 
         // -----------------------------------------------------------------------
         // Recette 2 : Tortilla facile (Espagne)
@@ -236,8 +242,6 @@ public class RecipeSeeder implements CommandLineRunner {
                 )
         );
 
-        recipeRepository.save(recipe2);
-
 
         List<RecipeIngredient> recipeIngredients2 = List.of(
                 new RecipeIngredient(recipe2, sel, null, QuantityType.NONE, null),
@@ -263,7 +267,7 @@ public class RecipeSeeder implements CommandLineRunner {
         recipe2.setType(main_course);
         recipe2.setTags(Set.of("vegetarien", "tortilla", "espagnol", "entrée", "omelette", "gluten free"));
         recipe2.setAuthor_note("Attention! Les pommes de terre ne doivent en aucun cas baigner dans l'huile. On doit retourner fréquemment et surveiller la cuisson. ");
-        recipeRepository.save(recipe2);
+
 
         // -----------------------------------------------------------------------
         // Recette 3 : Oeuf poché ultra simple
@@ -280,6 +284,7 @@ public class RecipeSeeder implements CommandLineRunner {
         recipe3.setCreatedDate(LocalDate.now().minusDays(10));
         recipe3.setOwner(clairment);
 
+
         List<RecipeIngredient> recipeIngredients3 = List.of(
                 new RecipeIngredient(recipe3, oeuf, 1.0, QuantityType.UNIT, null),
                 new RecipeIngredient(recipe3, eau, null, QuantityType.NONE, null)
@@ -294,11 +299,11 @@ public class RecipeSeeder implements CommandLineRunner {
                 new RecipeStep(recipe3, 5, "Sortez-le ensuite à l'aide d'une écumoire."),
                 new RecipeStep(recipe3, 6, "Et voilà, il n'y plus rien à faire, il est prêt !")
         );
-        recipe2.setRecipe_steps(recipeSteps3);
-        recipe2.setType(starter);
-        recipe2.setTags(Set.of("vegetarien", "quick", "oeuf", "oeuf poché", "entree", "gluten free"));
-        recipe2.setAuthor_note("C'est la recette la plus facile et la plus efficace pour un bel œuf poché. Il vaut mieux cuire des oeufs qui sont à température ambiante, pour éviter qu'ils éclatent. Pour cela il faut les sortir du réfrigérateur 1 heure avant.");
-        recipeRepository.save(recipe3);
+        recipe3.setRecipe_steps(recipeSteps3);
+        recipe3.setType(starter);
+        recipe3.setTags(Set.of("vegetarien", "quick", "oeuf", "oeuf poché", "entree", "gluten free"));
+        recipe3.setAuthor_note("C'est la recette la plus facile et la plus efficace pour un bel œuf poché. Il vaut mieux cuire des oeufs qui sont à température ambiante, pour éviter qu'ils éclatent. Pour cela il faut les sortir du réfrigérateur 1 heure avant.");
+
 
         // -----------------------------------------------------------------------
         // Recette 4 : Pizza Margherita
@@ -351,7 +356,6 @@ public class RecipeSeeder implements CommandLineRunner {
         recipe4.setType(main_course);
         recipe4.setTags(Set.of("pizza", "italienne", "fromage", "tomate"));
         recipe4.setAuthor_note("Pour une pâte plus croustillante, utilisez de la farine type 00.");
-        recipeRepository.save(recipe4);
 
         // -----------------------------------------------------------------------
         // Recette 5 : Soupe de légumes
@@ -391,7 +395,6 @@ public class RecipeSeeder implements CommandLineRunner {
         recipe5.setType(soup);
         recipe5.setTags(Set.of("soupe", "légumes", "vegetarien", "confort"));
         recipe5.setAuthor_note("Une touche de crème fraîche en fin de cuisson apporte de la douceur.");
-        recipeRepository.save(recipe5);
 
         // -----------------------------------------------------------------------
         // Recette 6 : Burger de Steak
@@ -442,7 +445,6 @@ public class RecipeSeeder implements CommandLineRunner {
         recipe6.setType(main_course);
         recipe6.setTags(Set.of("burger", "steak", "fast-food", "rapide"));
         recipe6.setAuthor_note("Pour une version plus légère, utilisez un steak haché de volaille.");
-        recipeRepository.save(recipe6);
 
         // -----------------------------------------------------------------------
         // Recette 7 : Gratin de courgettes
@@ -475,7 +477,6 @@ public class RecipeSeeder implements CommandLineRunner {
                 )
         );
 
-        recipeRepository.save(recipe7);
 
         List<RecipeIngredient> recipeIngredients7 = List.of(
                 new RecipeIngredient(recipe7, courgette, 3.0, QuantityType.UNIT, QuantityState.SLICED),
@@ -497,7 +498,6 @@ public class RecipeSeeder implements CommandLineRunner {
         recipe7.setType(main_course);
         recipe7.setTags(Set.of("gratin", "courgette", "fromage", "vegetarien"));
         recipe7.setAuthor_note("Accompagnez ce plat d'une salade verte pour un repas équilibré.");
-        recipeRepository.save(recipe7);
 
         // -----------------------------------------------------------------------
         // Recette 8 : Crêpes sucrées
@@ -536,7 +536,6 @@ public class RecipeSeeder implements CommandLineRunner {
         recipe8.setType(dessert);
         recipe8.setTags(Set.of("crêpes", "sucré", "dessert", "petit déjeuner"));
         recipe8.setAuthor_note("Servez avec du sirop d'érable, du miel ou de la confiture.");
-        recipeRepository.save(recipe8);
 
         // -----------------------------------------------------------------------
         // Recette 9 : Risotto aux champignons
@@ -593,7 +592,6 @@ public class RecipeSeeder implements CommandLineRunner {
         recipe9.setType(main_course);
         recipe9.setTags(Set.of("risotto", "champignons", "italien", "crémeux"));
         recipe9.setAuthor_note("Remuez constamment pour obtenir un risotto onctueux.");
-        recipeRepository.save(recipe9);
 
         // -----------------------------------------------------------------------
         // Recette 10 : Tarte aux pommes
@@ -647,7 +645,6 @@ public class RecipeSeeder implements CommandLineRunner {
         recipe10.setType(dessert);
         recipe10.setTags(Set.of("tarte", "pomme", "dessert", "traditionnel"));
         recipe10.setAuthor_note("À déguster tiède, éventuellement accompagnée d'une boule de glace à la vanille.");
-        recipeRepository.save(recipe10);
 
         // -----------------------------------------------------------------------
         // Recette 11 : Filet mignon de porc aux haricots et pommes de terre
@@ -680,7 +677,6 @@ public class RecipeSeeder implements CommandLineRunner {
                 )
         );
 
-        recipeRepository.save(recipe11);
 
         List<RecipeIngredient> recipeIngredients11 = List.of(
                 new RecipeIngredient(recipe11, filet_mignon_porc, 800.0, QuantityType.G, null),
@@ -711,7 +707,6 @@ public class RecipeSeeder implements CommandLineRunner {
         recipe11.setType(main_course);
         recipe11.setTags(Set.of("porc", "haricots", "pommes de terre", "complexe", "gourmand"));
         recipe11.setAuthor_note("Une recette complexe nécessitant une bonne gestion du temps pour obtenir une viande tendre et une sauce onctueuse.");
-        recipeRepository.save(recipe11);
 
         // -----------------------------------------------------------------------
         // Recette 12 (PRIVÉE) : Pavé de saumon en croûte d'herbes
@@ -764,6 +759,133 @@ public class RecipeSeeder implements CommandLineRunner {
         recipe12.setType(main_course);
         recipe12.setTags(Set.of("saumon", "poisson", "herbes", "four", "privé"));
         recipe12.setAuthor_note("Idéal avec une purée de pommes de terre maison.");
+
+        // Ajout d'un ingrédient supplémentaire nécessaire pour la recette problématique
+        Ingredient mayonnaise = ingredientRepository.findByName("Mayonnaise");
+        if(mayonnaise == null) {
+            throw new RuntimeException("Error in creating recipe. Ingredient 'Mayonnaise' not found");
+        }
+
+        // -----------------------------------------------------------------------
+        // Recette 13 : Salade douteuse (contenu problématique)
+        Recipe recipe13 = new Recipe();
+        recipe13.setTitle("Salade douteuse");
+        recipe13.setDescription("Cette salade propose un mélange inhabituel d'ingrédients dont la qualité est discutable. À consommer avec précaution.");
+        recipe13.setPreparation_time(25);
+        recipe13.setDifficulty(RecipeDifficulty.MEDIUM);
+        recipe13.setCooking_time(10);
+        recipe13.setServings_size(3);
+        recipe13.setImage_file_name(null);
+        recipe13.setLanguage("fr");
+        recipe13.setDeleted(false);
+        recipe13.setPublic(true);
+        recipe13.setCreatedDate(LocalDate.now().minusDays(1));
+        recipe13.setOwner(adel);
+
+        // Définir les ingrédients problématiques
+        List<RecipeIngredient> recipeIngredients13 = List.of(
+                new RecipeIngredient(recipe13, laitue, 1.0, QuantityType.HEART, QuantityState.CHOPPED),
+                new RecipeIngredient(recipe13, mayonnaise, 50.0, QuantityType.G, null)
+        );
+        recipe13.setRecipeIngredients(recipeIngredients13);
+
+        // Définir les étapes
+        List<RecipeStep> recipeSteps13 = List.of(
+                new RecipeStep(recipe13, 1, "Mélangez la laitue avec la mayonnaise douteuse."),
+                new RecipeStep(recipe13, 2, "Servez immédiatement sans réfrigération.")
+        );
+        recipe13.setRecipe_steps(recipeSteps13);
+
+        // Spécifier le type et les tags
+        recipe13.setType(salad);
+        recipe13.setTags(Set.of("salade", "douteuse", "problématique"));
+        recipe13.setAuthor_note("Attention : Cette recette peut être controversée en raison de la qualité de ses ingrédients.");
+
+        Report report1 = new Report();
+        report1.setMessage("\"Contenu inapproprié, ne devrait pas être publié.\"");
+        report1.setReporter(paul);
+        report1.setTarget(recipe13);
+        report1.setType(ReportType.LOW_QUALITY);
+        report1.setCreatedDate(LocalDate.now().minusDays(1));
+
+        Report report2 = new Report();
+        report2.setMessage("Les ingrédients sont douteux, vérifiez la source.");
+        report2.setReporter(vincent);
+        report2.setTarget(recipe13);
+        report2.setType(ReportType.INAPPROPRIATE_CONTENT);
+        report2.setCreatedDate(LocalDate.now().minusDays(1));
+
+        // -----------------------------------------------------------------------
+        // Recette 14 : Smoothie dangereux (contenu problématique)
+        Recipe recipe14 = new Recipe();
+        recipe14.setTitle("Smoothie dangereux");
+        recipe14.setDescription("Un smoothie aux fruits exotiques dont la combinaison peut s'avérer surprenante et potentiellement risquée pour la santé.");
+        recipe14.setPreparation_time(5);
+        recipe14.setDifficulty(RecipeDifficulty.EASY);
+        recipe14.setCooking_time(0);
+        recipe14.setServings_size(2);
+        recipe14.setImage_file_name(null);
+        recipe14.setLanguage("fr");
+        recipe14.setDeleted(false);
+        recipe14.setPublic(true);
+        recipe14.setCreatedDate(LocalDate.now().minusDays(2));
+        recipe14.setOwner(asouchon);
+
+        // Définir des ingrédients pouvant être problématiques
+        List<RecipeIngredient> recipeIngredients14 = List.of(
+                new RecipeIngredient(recipe14, citron, 2.0, QuantityType.UNIT, null),
+                new RecipeIngredient(recipe14, sucre, 20.0, QuantityType.G, null)
+        );
+        recipe14.setRecipeIngredients(recipeIngredients14);
+
+        // Définir les étapes
+        List<RecipeStep> recipeSteps14 = List.of(
+                new RecipeStep(recipe14, 1, "Mélangez vigoureusement les ingrédients dans un blender."),
+                new RecipeStep(recipe14, 2, "Versez dans des verres et consommez sans délai.")
+        );
+        recipe14.setRecipe_steps(recipeSteps14);
+
+        // Spécifier le type et les tags
+        recipe14.setType(dessert);
+        recipe14.setTags(Set.of("smoothie", "dangereux", "problématique"));
+        recipe14.setAuthor_note("Ce smoothie a fait l'objet de plusieurs signalements en raison de sa recette non conventionnelle.");
+
+        Report report3 = new Report();
+        report3.setMessage("Recette à risque, les combinaisons ne semblent pas sûres.");
+        report3.setReporter(clairment);
+        report3.setTarget(recipe14);
+        report3.setType(ReportType.LOW_QUALITY);
+        report3.setCreatedDate(LocalDate.now().minusDays(10));
+
+        Report report4 = new Report();
+        report4.setMessage("Contenu volé");
+        report4.setReporter(pcruel);
+        report4.setTarget(recipe14);
+        report4.setType(ReportType.COPYRIGHT_VIOLATION);
+        report4.setCreatedDate(LocalDate.now().minusDays(7));
+
+
+
+
+        recipeRepository.save(recipe13);
+        recipeRepository.save(recipe14);
+
+        reportRepository.save(report1);
+        reportRepository.save(report2);
+        reportRepository.save(report3);
+        reportRepository.save(report4);
+
+        recipeRepository.save(recipe1);
+        recipeRepository.save(recipe2);
+        recipeRepository.save(recipe3);
+        recipeRepository.save(recipe4);
+        recipeRepository.save(recipe5);
+        recipeRepository.save(recipe6);
+        recipeRepository.save(recipe7);
+        recipeRepository.save(recipe8);
+        recipeRepository.save(recipe9);
+        recipeRepository.save(recipe10);
+        recipeRepository.save(recipe11);
         recipeRepository.save(recipe12);
     }
 
