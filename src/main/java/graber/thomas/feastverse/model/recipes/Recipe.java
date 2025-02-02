@@ -1,6 +1,7 @@
 package graber.thomas.feastverse.model.recipes;
 
 import graber.thomas.feastverse.model.comment.Commentable;
+import graber.thomas.feastverse.model.like.RecipeLike;
 import graber.thomas.feastverse.model.user.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -9,6 +10,7 @@ import org.hibernate.validator.constraints.Length;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -63,6 +65,9 @@ public class Recipe extends Commentable {
     private LocalDate createdDate;
 
     private LocalDate updatedDate;
+
+    @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<RecipeLike> likes = new HashSet<>();
 
     public RecipeType getType() {
         return type;
@@ -208,5 +213,13 @@ public class Recipe extends Commentable {
 
     public void setTags(Set<String> tags) {
         this.tags = tags;
+    }
+
+    public Set<RecipeLike> getLikes() {
+        return likes;
+    }
+
+    public void setLikes(Set<RecipeLike> likes) {
+        this.likes = likes;
     }
 }

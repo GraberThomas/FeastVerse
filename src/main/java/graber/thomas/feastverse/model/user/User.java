@@ -1,10 +1,12 @@
 package graber.thomas.feastverse.model.user;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import graber.thomas.feastverse.model.like.RecipeLike;
 import graber.thomas.feastverse.model.report.Reportable;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -44,6 +46,9 @@ public class User extends Reportable {
     private LocalDate createdDate;
 
     private LocalDate updatedDate;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<RecipeLike> recipeLikes = new HashSet<>();
 
     public User() {
     }
@@ -120,5 +125,13 @@ public class User extends Reportable {
 
     public void setPseudo(String pseudo) {
         this.pseudo = pseudo;
+    }
+
+    public Set<RecipeLike> getRecipeLikesLikes() {
+        return recipeLikes;
+    }
+
+    public void setRecipeLikesLikes(Set<RecipeLike> recipeLikes) {
+        this.recipeLikes = recipeLikes;
     }
 }

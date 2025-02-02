@@ -24,6 +24,7 @@ public record RecipeUserViewDto(
         boolean is_public,
         String language,
         LocalDate createdDate,
-        LocalDate updatedDate
+        LocalDate updatedDate,
+        int like_count
 ) implements RecipeViewDto {}
 

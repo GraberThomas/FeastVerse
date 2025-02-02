@@ -11,6 +11,7 @@ import graber.thomas.feastverse.dto.reports.ReportOnTargetCreateDto;
 import graber.thomas.feastverse.dto.reports.ReportViewDTO;
 import graber.thomas.feastverse.model.comment.Comment;
 import graber.thomas.feastverse.model.comment.Commentable;
+import graber.thomas.feastverse.model.like.RecipeLike;
 import graber.thomas.feastverse.model.recipes.Recipe;
 import graber.thomas.feastverse.model.recipes.RecipeDifficulty;
 import graber.thomas.feastverse.model.recipes.RecipeStep;
@@ -18,9 +19,12 @@ import graber.thomas.feastverse.model.report.Report;
 import graber.thomas.feastverse.model.user.User;
 import graber.thomas.feastverse.model.user.UserType;
 import graber.thomas.feastverse.service.comment.CommentService;
+import graber.thomas.feastverse.service.like.LikeService;
+import graber.thomas.feastverse.service.like.LikeServiceImpl;
 import graber.thomas.feastverse.service.recipes.RecipeService;
 import graber.thomas.feastverse.service.report.ReportService;
 import graber.thomas.feastverse.service.security.SecurityService;
+import graber.thomas.feastverse.service.user.UserService;
 import graber.thomas.feastverse.utils.DeletedFilter;
 import graber.thomas.feastverse.utils.VisibilityFilter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -32,7 +36,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -42,7 +45,6 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Tag(name = "Recipes", description = "Endpoints for recipes")
@@ -58,9 +60,11 @@ public class RecipeController {
     private final CommentMapper commentMapper;
     private final ReportService reportService;
     private final ReportMapper reportMapper;
+    private final UserService userService;
+    private final LikeService likeService;
 
 
-    public RecipeController(RecipeService recipeService, RecipeMapper recipeMapper, SecurityService securityService, CommentService commentService, CommentMapper commentMapper, ReportService reportService, ReportMapper reportMapper) {
+    public RecipeController(RecipeService recipeService, RecipeMapper recipeMapper, SecurityService securityService, CommentService commentService, CommentMapper commentMapper, ReportService reportService, ReportMapper reportMapper, UserService userService, LikeService likeService) {
         this.recipeService = recipeService;
         this.recipeMapper = recipeMapper;
         this.securityService = securityService;
@@ -68,6 +72,8 @@ public class RecipeController {
         this.commentMapper = commentMapper;
         this.reportService = reportService;
         this.reportMapper = reportMapper;
+        this.userService = userService;
+        this.likeService = likeService;
     }
 
     @GetMapping("/{recipeId}")
@@ -277,6 +283,41 @@ public class RecipeController {
         );
 
         return reports.map(reportMapper::toReportView);
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/{recipeId}/like")
+    public ResponseEntity<Void> likeRecipe(@PathVariable UUID recipeId){
+        Recipe recipe = recipeService.getRecipeById(recipeId).orElseThrow(
+                () -> new EntityNotFoundException("No recipe found for id " + recipeId + ".")
+        );
+
+        UUID userId = securityService.getCurrentUserId();
+        User user = userService.getById(userId).orElseThrow(
+                () -> new EntityNotFoundException("No user found for id " + userId + ".")
+        );
+
+        likeService.addLikeToRecipe(recipe, user).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to like recipe.")
+        );
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @DeleteMapping("/{recipeId}/like")
+    public ResponseEntity<Void> unlikeRecipe(@PathVariable UUID recipeId){
+        Recipe recipe = recipeService.getRecipeById(recipeId).orElseThrow(
+                () -> new EntityNotFoundException("No recipe found for id " + recipeId + ".")
+        );
+
+        UUID userId = securityService.getCurrentUserId();
+        User user = userService.getById(userId).orElseThrow(
+                () -> new EntityNotFoundException("No user found for id " + userId + ".")
+        );
+
+        likeService.deleteLikeFromRecipe(recipe, user);
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     // UTILS METHODS

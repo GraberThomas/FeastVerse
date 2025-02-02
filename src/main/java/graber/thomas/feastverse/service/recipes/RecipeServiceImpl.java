@@ -1,6 +1,6 @@
 package graber.thomas.feastverse.service.recipes;
 
-import graber.thomas.feastverse.dto.recipes.RecipeViewDto;
+
 import graber.thomas.feastverse.exception.ForbiddenActionException;
 import graber.thomas.feastverse.exception.ResourceAlreadyExist;
 import graber.thomas.feastverse.model.recipes.Recipe;
@@ -13,6 +13,7 @@ import graber.thomas.feastverse.repository.recipes.RecipeSpecification;
 import graber.thomas.feastverse.repository.recipes.RecipeStepRepository;
 import graber.thomas.feastverse.repository.recipes.RecipeTypeRepository;
 import graber.thomas.feastverse.service.security.SecurityService;
+import graber.thomas.feastverse.service.user.UserService;
 import graber.thomas.feastverse.utils.DeletedFilter;
 import graber.thomas.feastverse.utils.VisibilityFilter;
 import jakarta.persistence.EntityNotFoundException;
@@ -24,7 +25,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import javax.naming.NameAlreadyBoundException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;

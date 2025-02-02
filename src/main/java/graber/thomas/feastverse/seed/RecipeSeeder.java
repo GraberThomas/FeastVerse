@@ -1,8 +1,8 @@
 package graber.thomas.feastverse.seed;
 
 import graber.thomas.feastverse.model.comment.Comment;
-import graber.thomas.feastverse.model.comment.Commentable;
 import graber.thomas.feastverse.model.ingredient.Ingredient;
+import graber.thomas.feastverse.model.like.RecipeLike;
 import graber.thomas.feastverse.model.recipes.*;
 import graber.thomas.feastverse.model.report.Report;
 import graber.thomas.feastverse.model.report.ReportType;
@@ -13,12 +13,13 @@ import graber.thomas.feastverse.repository.recipes.RecipeRepository;
 import graber.thomas.feastverse.repository.recipes.RecipeTypeRepository;
 import graber.thomas.feastverse.repository.report.ReportRepository;
 import graber.thomas.feastverse.repository.user.UserRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
@@ -865,6 +866,56 @@ public class RecipeSeeder implements CommandLineRunner {
         report4.setCreatedDate(LocalDate.now().minusDays(7));
 
 
+        // Exemple pour like1 sur recipe8
+        RecipeLike like1 = new RecipeLike();
+        like1.setRecipe(recipe8);
+        like1.setUser(vincent);
+        like1.setLikedAt(LocalDateTime.now());
+        recipe8.getLikes().add(like1);
+
+        // Pour like2 sur recipe12
+        RecipeLike like2 = new RecipeLike();
+        like2.setRecipe(recipe12);
+        like2.setUser(emacron);
+        like2.setLikedAt(LocalDateTime.now());
+        recipe12.getLikes().add(like2);
+
+        // Pour like3 sur recipe13
+        RecipeLike like3 = new RecipeLike();
+        like3.setRecipe(recipe13);
+        like3.setUser(adel);
+        like3.setLikedAt(LocalDateTime.now());
+        recipe13.getLikes().add(like3);
+
+        // Pour like4 sur recipe14
+        RecipeLike like4 = new RecipeLike();
+        like4.setRecipe(recipe14);
+        like4.setUser(asouchon);
+        like4.setLikedAt(LocalDateTime.now());
+        recipe14.getLikes().add(like4);
+
+        // Pour like5 sur recipe1
+        RecipeLike like5 = new RecipeLike();
+        like5.setRecipe(recipe1);
+        like5.setUser(vincent);
+        like5.setLikedAt(LocalDateTime.now());
+        recipe1.getLikes().add(like5);
+
+        // Pour like6 sur recipe1
+        RecipeLike like6 = new RecipeLike();
+        like6.setRecipe(recipe1);
+        like6.setUser(emacron);
+        like6.setLikedAt(LocalDateTime.now());
+        recipe1.getLikes().add(like6);
+
+        List<User> allManagedUsers = List.of(emacron, clairment, adel, paul, guitare, asouchon, pcruel, vincent);
+        for (User user : allManagedUsers) {
+            RecipeLike like = new RecipeLike();
+            like.setRecipe(recipe2);
+            like.setUser(user);
+            like.setLikedAt(LocalDateTime.now());
+            recipe2.getLikes().add(like);
+        }
 
 
         recipeRepository.save(recipe13);
@@ -889,8 +940,9 @@ public class RecipeSeeder implements CommandLineRunner {
         recipeRepository.save(recipe12);
     }
 
+    @Transactional
     @Override
-    public void run(String... args) throws Exception {
+    public void run(String... args) {
         seedRecipesTypes();
         seedRecipes();
     }

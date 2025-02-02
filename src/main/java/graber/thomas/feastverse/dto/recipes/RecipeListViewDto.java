@@ -8,6 +8,7 @@ public record RecipeListViewDto(
         String type_name,
         Integer preparation_time,
         Integer cooking_time,
+        int like_count,
         String image_file_name
 ) implements RecipeViewDto {
 }

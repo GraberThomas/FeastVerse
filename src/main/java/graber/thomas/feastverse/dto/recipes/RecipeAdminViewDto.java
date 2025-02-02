@@ -26,5 +26,6 @@ public record RecipeAdminViewDto(
         boolean is_deleted,
         String language,
         LocalDate createdDate,
-        LocalDate updatedDate
+        LocalDate updatedDate,
+        int like_count
 ) implements RecipeViewDto{}
