@@ -1,5 +1,7 @@
 package graber.thomas.feastverse.seed;
 
+import graber.thomas.feastverse.model.comment.Comment;
+import graber.thomas.feastverse.model.comment.Commentable;
 import graber.thomas.feastverse.model.ingredient.Ingredient;
 import graber.thomas.feastverse.model.recipes.*;
 import graber.thomas.feastverse.model.user.User;
@@ -60,8 +62,43 @@ public class RecipeSeeder implements CommandLineRunner {
         RecipeType dessert = recipeTypeRepository.findByName("DESSERT");
         RecipeType soup = recipeTypeRepository.findByName("SOUP");
 
-        User creator = userRepository.findUserByEmail("emacron@gmail.com");
-        if (creator == null) {
+        User emacron = userRepository.findUserByEmail("emacron@gmail.com");
+        if (emacron == null) {
+            throw new RuntimeException("Error in creating recipe. User not found");
+        }
+
+        User clairment = userRepository.findUserByEmail("claire.ment@feastverse.com");
+        if (clairment == null) {
+            throw new RuntimeException("Error in creating recipe. User not found");
+        }
+
+        User adel = userRepository.findUserByEmail("ade.le@feastverse.com");
+        if (adel == null) {
+            throw new RuntimeException("Error in creating recipe. User not found");
+        }
+
+        User paul = userRepository.findUserByEmail("paul.lent@feastverse.com");
+        if (paul == null) {
+            throw new RuntimeException("Error in creating recipe. User not found");
+        }
+
+        User guitare = userRepository.findUserByEmail("guy.tare@feastverse.com");
+        if (guitare == null) {
+            throw new RuntimeException("Error in creating recipe. User not found");
+        }
+
+        User asouchon = userRepository.findUserByEmail("asouchon_fake@gmail.com");
+        if (asouchon == null) {
+            throw new RuntimeException("Error in creating recipe. User not found");
+        }
+
+        User pcruel = userRepository.findUserByEmail("pcruel_fake@gmail.com");
+        if (pcruel == null) {
+            throw new RuntimeException("Error in creating recipe. User not found");
+        }
+
+        User vincent = userRepository.findUserByEmail("vincent.tastique@feastverse.com");
+        if (vincent == null) {
             throw new RuntimeException("Error in creating recipe. User not found");
         }
 
@@ -119,7 +156,22 @@ public class RecipeSeeder implements CommandLineRunner {
         recipe1.setDeleted(false);
         recipe1.setPublic(true);
         recipe1.setCreatedDate(LocalDate.now());
-        recipe1.setOwner(creator);
+        recipe1.setOwner(emacron);
+
+        recipe1.addComment(
+                new Comment(
+                        "Super rapide à faire, idéal pour un déjeuner sur le pouce !",
+                        recipe1,
+                        clairment
+                )
+        );
+        recipe1.addComment(
+                new Comment(
+                        "J'ajoute toujours un peu plus de parmesan, c'est encore meilleur !",
+                        recipe1,
+                        vincent
+                )
+        );
 
         List<RecipeIngredient> recipeIngredients1 = List.of(
                 new RecipeIngredient(recipe1, huile_olive, 2.0, QuantityType.TBSP, null),
@@ -167,7 +219,24 @@ public class RecipeSeeder implements CommandLineRunner {
         recipe2.setDeleted(false);
         recipe2.setPublic(true);
         recipe2.setCreatedDate(LocalDate.now().minusDays(2));
-        recipe2.setOwner(creator);
+        recipe2.setOwner(guitare);
+
+        recipe2.addComment(
+                new Comment(
+                        "Ma grand-mère la faisait déjà comme ça, c'est super authentique.",
+                        recipe2,
+                        asouchon
+                )
+        );
+        recipe2.addComment(
+                new Comment(
+                        "Trop bon ! J'ai ajouté un peu de chorizo pour relever le goût.",
+                        recipe2,
+                        pcruel
+                )
+        );
+
+        recipeRepository.save(recipe2);
 
 
         List<RecipeIngredient> recipeIngredients2 = List.of(
@@ -209,7 +278,7 @@ public class RecipeSeeder implements CommandLineRunner {
         recipe3.setDeleted(false);
         recipe3.setPublic(true);
         recipe3.setCreatedDate(LocalDate.now().minusDays(10));
-        recipe3.setOwner(creator);
+        recipe3.setOwner(clairment);
 
         List<RecipeIngredient> recipeIngredients3 = List.of(
                 new RecipeIngredient(recipe3, oeuf, 1.0, QuantityType.UNIT, null),
@@ -245,7 +314,22 @@ public class RecipeSeeder implements CommandLineRunner {
         recipe4.setDeleted(false);
         recipe4.setPublic(true);
         recipe4.setCreatedDate(LocalDate.now().minusDays(5));
-        recipe4.setOwner(creator);
+        recipe4.setOwner(clairment);
+
+        recipe4.addComment(
+                new Comment(
+                        "Classique et délicieux. Attention à bien égoutter la mozzarella !",
+                        recipe4,
+                        paul
+                )
+        );
+        recipe4.addComment(
+                new Comment(
+                        "Parfait en ajoutant quelques tomates cerises confites au-dessus.",
+                        recipe4,
+                        vincent
+                )
+        );
 
         List<RecipeIngredient> recipeIngredients4 = List.of(
                 new RecipeIngredient(recipe4, farine, 250.0, QuantityType.G, null),
@@ -283,7 +367,7 @@ public class RecipeSeeder implements CommandLineRunner {
         recipe5.setDeleted(false);
         recipe5.setPublic(true);
         recipe5.setCreatedDate(LocalDate.now().minusDays(3));
-        recipe5.setOwner(creator);
+        recipe5.setOwner(emacron);
 
         List<RecipeIngredient> recipeIngredients5 = List.of(
                 new RecipeIngredient(recipe5, carotte, 2.0, QuantityType.UNIT, QuantityState.CHOPPED),
@@ -323,14 +407,14 @@ public class RecipeSeeder implements CommandLineRunner {
         recipe6.setDeleted(false);
         recipe6.setPublic(true);
         recipe6.setCreatedDate(LocalDate.now().minusDays(7));
-        recipe6.setOwner(creator);
+        recipe6.setOwner(paul);
 
         Ingredient sauce_burger = new Ingredient();
         sauce_burger.setName("Sauce burger");
         sauce_burger.setDeleted(false);
         sauce_burger.setPublic(true);
         sauce_burger.setCreatedDate(LocalDate.now().minusDays(7));
-        sauce_burger.setOwner(creator);
+        sauce_burger.setOwner(emacron);
         sauce_burger.setImage_file_name(null);
         sauce_burger.setDescription(null);
         sauce_burger.setType(ingredientTypeRepository.getIngredientTypeById(10L));
@@ -374,7 +458,24 @@ public class RecipeSeeder implements CommandLineRunner {
         recipe7.setDeleted(false);
         recipe7.setPublic(true);
         recipe7.setCreatedDate(LocalDate.now().minusDays(4));
-        recipe7.setOwner(creator);
+        recipe7.setOwner(paul);
+
+        recipe7.addComment(
+                new Comment(
+                        "Je mets parfois un mélange chèvre-emmental, c'est encore plus gourmand !",
+                        recipe7,
+                        clairment
+                )
+        );
+        recipe7.addComment(
+                new Comment(
+                        "Recette rapide et efficace, mes enfants adorent.",
+                        recipe7,
+                        pcruel
+                )
+        );
+
+        recipeRepository.save(recipe7);
 
         List<RecipeIngredient> recipeIngredients7 = List.of(
                 new RecipeIngredient(recipe7, courgette, 3.0, QuantityType.UNIT, QuantityState.SLICED),
@@ -412,7 +513,7 @@ public class RecipeSeeder implements CommandLineRunner {
         recipe8.setDeleted(false);
         recipe8.setPublic(true);
         recipe8.setCreatedDate(LocalDate.now().minusDays(1));
-        recipe8.setOwner(creator);
+        recipe8.setOwner(guitare);
 
         List<RecipeIngredient> recipeIngredients8 = List.of(
                 new RecipeIngredient(recipe8, farine, 200.0, QuantityType.G, null),
@@ -451,7 +552,22 @@ public class RecipeSeeder implements CommandLineRunner {
         recipe9.setDeleted(false);
         recipe9.setPublic(true);
         recipe9.setCreatedDate(LocalDate.now().minusDays(6));
-        recipe9.setOwner(creator);
+        recipe9.setOwner(emacron);
+
+        recipe9.addComment(
+                new Comment(
+                        "Super onctueux, j'ai ajouté un peu de crème à la fin pour plus de gourmandise.",
+                        recipe9,
+                        asouchon
+                )
+        );
+        recipe9.addComment(
+                new Comment(
+                        "Parfait avec une pointe d'ail supplémentaire, bon appétit !",
+                        recipe9,
+                        paul
+                )
+        );
 
         List<RecipeIngredient> recipeIngredients9 = List.of(
                 new RecipeIngredient(recipe9, riz_arborio, 300.0, QuantityType.G, null),
@@ -493,7 +609,21 @@ public class RecipeSeeder implements CommandLineRunner {
         recipe10.setDeleted(false);
         recipe10.setPublic(true);
         recipe10.setCreatedDate(LocalDate.now().minusDays(8));
-        recipe10.setOwner(creator);
+        recipe10.setOwner(clairment);
+
+        recipe10.addComment(
+                new Comment(
+                        "Amazing ! This recipe is very good. Be carefull to the size of farine.",
+                        recipe10,
+                        paul
+                )
+        );
+
+        Comment newComment =  new Comment("Berk. J'aime pas les pommes.", recipe10, adel);
+        newComment.setDeleted(true);
+
+        recipe10.addComment(newComment);
+
 
         List<RecipeIngredient> recipeIngredients10 = List.of(
                 new RecipeIngredient(recipe10, farine, 300.0, QuantityType.G, null),
@@ -533,7 +663,24 @@ public class RecipeSeeder implements CommandLineRunner {
         recipe11.setDeleted(false);
         recipe11.setPublic(true);
         recipe11.setCreatedDate(LocalDate.now().minusDays(1));
-        recipe11.setOwner(creator);
+        recipe11.setOwner(adel);
+
+        recipe11.addComment(
+                new Comment(
+                        "Assez long à préparer, mais le résultat est génial.",
+                        recipe11,
+                        clairment
+                )
+        );
+        recipe11.addComment(
+                new Comment(
+                        "J'ai remplacé le vin blanc par du cidre, c'était une tuerie !",
+                        recipe11,
+                        vincent
+                )
+        );
+
+        recipeRepository.save(recipe11);
 
         List<RecipeIngredient> recipeIngredients11 = List.of(
                 new RecipeIngredient(recipe11, filet_mignon_porc, 800.0, QuantityType.G, null),
@@ -580,7 +727,7 @@ public class RecipeSeeder implements CommandLineRunner {
         recipe12.setDeleted(false);
         recipe12.setPublic(false);
         recipe12.setCreatedDate(LocalDate.now().minusDays(2));
-        recipe12.setOwner(creator);
+        recipe12.setOwner(emacron);
 
         Ingredient saumon = ingredientRepository.findByName("Saumon");
         Ingredient chapelure = ingredientRepository.findByName("Chapelure");

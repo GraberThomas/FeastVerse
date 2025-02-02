@@ -5,10 +5,12 @@ import graber.thomas.feastverse.exception.ForbiddenActionException;
 import graber.thomas.feastverse.exception.ResourceAlreadyExist;
 import graber.thomas.feastverse.model.recipes.Recipe;
 import graber.thomas.feastverse.model.recipes.RecipeDifficulty;
+import graber.thomas.feastverse.model.recipes.RecipeStep;
 import graber.thomas.feastverse.model.recipes.RecipeType;
 import graber.thomas.feastverse.model.user.UserType;
 import graber.thomas.feastverse.repository.recipes.RecipeRepository;
 import graber.thomas.feastverse.repository.recipes.RecipeSpecification;
+import graber.thomas.feastverse.repository.recipes.RecipeStepRepository;
 import graber.thomas.feastverse.repository.recipes.RecipeTypeRepository;
 import graber.thomas.feastverse.service.security.SecurityService;
 import graber.thomas.feastverse.utils.DeletedFilter;
@@ -33,11 +35,13 @@ public class RecipeServiceImpl implements RecipeService {
     private static final Logger logger = LoggerFactory.getLogger(RecipeServiceImpl.class);
     private final RecipeRepository recipeRepository;
     private final SecurityService securityService;
+    private final RecipeStepRepository recipeStepRepository;
 
-    public RecipeServiceImpl(RecipeTypeRepository recipeTypeRepository, RecipeRepository recipeRepository, SecurityService securityService) {
+    public RecipeServiceImpl(RecipeTypeRepository recipeTypeRepository, RecipeRepository recipeRepository, SecurityService securityService, RecipeStepRepository recipeStepRepository) {
         this.recipeTypeRepository = recipeTypeRepository;
         this.recipeRepository = recipeRepository;
         this.securityService = securityService;
+        this.recipeStepRepository = recipeStepRepository;
     }
 
     @Override
@@ -162,5 +166,10 @@ public class RecipeServiceImpl implements RecipeService {
         );
 
         return this.recipeRepository.findAll(spec, pageable);
+    }
+
+    @Override
+    public Optional<RecipeStep> getRecipeStepById(UUID id) {
+        return recipeStepRepository.findById(id);
     }
 }
